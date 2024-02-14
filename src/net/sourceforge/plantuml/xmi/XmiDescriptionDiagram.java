@@ -2,14 +2,14 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2023, Arnaud Roques
+ * (C) Copyright 2009-2024, Arnaud Roques
  *
- * Project Info:  http://plantuml.com
+ * Project Info:  https://plantuml.com
  * 
  * If you like this project or if you find it useful, you can support us at:
  * 
- * http://plantuml.com/patreon (only 1$ per month!)
- * http://plantuml.com/paypal
+ * https://plantuml.com/patreon (only 1$ per month!)
+ * https://plantuml.com/paypal
  * 
  * This file is part of PlantUML.
  *
@@ -52,13 +52,11 @@ import javax.xml.transform.stream.StreamResult;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
-import net.sourceforge.plantuml.cucadiagram.Display;
-import net.sourceforge.plantuml.cucadiagram.GroupRoot;
-import net.sourceforge.plantuml.cucadiagram.IEntity;
-import net.sourceforge.plantuml.cucadiagram.IGroup;
-import net.sourceforge.plantuml.cucadiagram.Link;
-import net.sourceforge.plantuml.cucadiagram.LinkDecor;
+import net.sourceforge.plantuml.abel.Entity;
+import net.sourceforge.plantuml.abel.Link;
+import net.sourceforge.plantuml.decoration.LinkDecor;
 import net.sourceforge.plantuml.descdiagram.DescriptionDiagram;
+import net.sourceforge.plantuml.klimt.creole.Display;
 import net.sourceforge.plantuml.xml.XmlFactories;
 
 public class XmiDescriptionDiagram implements XmlDiagramTransformer {
@@ -99,12 +97,12 @@ public class XmiDescriptionDiagram implements XmlDiagramTransformer {
 		this.ownedElement = document.createElement("UML:Namespace.ownedElement");
 		model.appendChild(ownedElement);
 
-		for (final IGroup gr : diagram.getGroups(false))
-			if (gr.getParentContainer() instanceof GroupRoot)
+		for (final Entity gr : diagram.getEntityFactory().groups())
+			if (gr.getParentContainer().isRoot())
 				addElement(gr, ownedElement);
 
-		for (final IEntity ent : diagram.getLeafsvalues())
-			if (ent.getParentContainer() instanceof GroupRoot)
+		for (final Entity ent : diagram.getEntityFactory().leafs())
+			if (ent.getParentContainer().isRoot())
 				addElement(ent, ownedElement);
 
 		for (final Link link : diagram.getLinks())
@@ -112,14 +110,14 @@ public class XmiDescriptionDiagram implements XmlDiagramTransformer {
 
 	}
 
-	private void addElement(final IEntity tobeAdded, Element container) {
+	private void addElement(final Entity tobeAdded, Element container) {
 		final Element element = createEntityNode(tobeAdded);
 		container.appendChild(element);
-		for (final IEntity ent : diagram.getGroups(false))
+		for (final Entity ent : diagram.getEntityFactory().groups())
 			if (ent.getParentContainer() == tobeAdded)
 				addElement(ent, element);
 
-		for (final IEntity ent : diagram.getLeafsvalues())
+		for (final Entity ent : diagram.getEntityFactory().leafs())
 			if (ent.getParentContainer() == tobeAdded)
 				addElement(ent, element);
 
@@ -147,8 +145,8 @@ public class XmiDescriptionDiagram implements XmlDiagramTransformer {
 		end1.setAttribute("xmi.id", "end" + diagram.getUniqueSequence());
 		end1.setAttribute("association", assId);
 		end1.setAttribute("type", link.getEntity1().getUid());
-		if (link.getQualifier1() != null)
-			end1.setAttribute("name", forXMI(link.getQualifier1()));
+		if (link.getQuantifier1() != null)
+			end1.setAttribute("name", forXMI(link.getQuantifier1()));
 
 		final Element endparticipant1 = document.createElement("UML:AssociationEnd.participant");
 
@@ -165,8 +163,8 @@ public class XmiDescriptionDiagram implements XmlDiagramTransformer {
 		end2.setAttribute("xmi.id", "end" + diagram.getUniqueSequence());
 		end2.setAttribute("association", assId);
 		end2.setAttribute("type", link.getEntity2().getUid());
-		if (link.getQualifier2() != null)
-			end2.setAttribute("name", forXMI(link.getQualifier2()));
+		if (link.getQuantifier2() != null)
+			end2.setAttribute("name", forXMI(link.getQuantifier2()));
 
 		final Element endparticipant2 = document.createElement("UML:AssociationEnd.participant");
 		if (link.getType().getDecor1() == LinkDecor.COMPOSITION)
@@ -184,7 +182,7 @@ public class XmiDescriptionDiagram implements XmlDiagramTransformer {
 
 	}
 
-	private Element createEntityNode(IEntity entity) {
+	private Element createEntityNode(Entity entity) {
 		final Element cla = document.createElement("UML:Component");
 
 		cla.setAttribute("xmi.id", entity.getUid());

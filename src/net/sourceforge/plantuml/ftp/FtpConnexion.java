@@ -2,14 +2,14 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2023, Arnaud Roques
+ * (C) Copyright 2009-2024, Arnaud Roques
  *
- * Project Info:  http://plantuml.com
+ * Project Info:  https://plantuml.com
  * 
  * If you like this project or if you find it useful, you can support us at:
  * 
- * http://plantuml.com/patreon (only 1$ per month!)
- * http://plantuml.com/paypal
+ * https://plantuml.com/patreon (only 1$ per month!)
+ * https://plantuml.com/paypal
  * 
  * This file is part of PlantUML.
  *
@@ -53,6 +53,7 @@ import net.sourceforge.plantuml.SourceStringReader;
 import net.sourceforge.plantuml.core.DiagramDescription;
 
 public class FtpConnexion {
+	// ::remove folder when __CORE__
 
 	private final String user;
 	private final Map<String, String> incoming = new HashMap<String, String>();
@@ -67,9 +68,9 @@ public class FtpConnexion {
 	}
 
 	public synchronized void addIncoming(String fileName, String data) {
-		if (fileName.startsWith("/")) {
+		if (fileName.startsWith("/"))
 			throw new IllegalArgumentException();
-		}
+
 		incoming.put(fileName, data);
 	}
 
@@ -86,81 +87,74 @@ public class FtpConnexion {
 	}
 
 	public synchronized boolean willExist(String fileName) {
-		if (incoming.containsKey(fileName)) {
+		if (incoming.containsKey(fileName))
 			return true;
-		}
-		if (outgoing.containsKey(fileName)) {
+
+		if (outgoing.containsKey(fileName))
 			return true;
-		}
-		if (futureOutgoing.contains(fileName)) {
+
+		if (futureOutgoing.contains(fileName))
 			return true;
-		}
+
 		return false;
 	}
 
 	public synchronized boolean doesExist(String fileName) {
-		if (incoming.containsKey(fileName)) {
+		if (incoming.containsKey(fileName))
 			return true;
-		}
-		if (outgoing.containsKey(fileName)) {
+
+		if (outgoing.containsKey(fileName))
 			return true;
-		}
+
 		return false;
 	}
 
 	public synchronized byte[] getData(String fileName) throws InterruptedException {
-		if (fileName.startsWith("/")) {
+		if (fileName.startsWith("/"))
 			throw new IllegalArgumentException();
-		}
+
 		final String data = incoming.get(fileName);
-		if (data != null) {
+		if (data != null)
 			return data.getBytes();
-		}
-		// do {
-		// if (willExist(fileName) == false) {
-		// return null;
-		// }
+
 		final byte data2[] = outgoing.get(fileName);
-		if (data2 == null) {
+		if (data2 == null)
 			return new byte[1];
-		}
-		// if (data2 != null) {
+
 		return data2;
-		// }
-		// Thread.sleep(200L);
-		// } while (true);
 	}
 
 	public synchronized int getSize(String fileName) {
-		if (fileName.startsWith("/")) {
+		if (fileName.startsWith("/"))
 			throw new IllegalArgumentException();
-		}
+
 		final String data = incoming.get(fileName);
-		if (data != null) {
+		if (data != null)
 			return data.length();
-		}
+
 		final byte data2[] = outgoing.get(fileName);
-		if (data2 != null) {
+		if (data2 != null)
 			return data2.length;
-		}
+
 		return 0;
 	}
 
 	public void processImage(String fileName) throws IOException {
-		if (fileName.startsWith("/")) {
+		if (fileName.startsWith("/"))
 			throw new IllegalArgumentException();
-		}
+
 		final String pngFileName = getFutureFileName(fileName);
 		boolean done = false;
 		try {
 			final SourceStringReader sourceStringReader = new SourceStringReader(incoming.get(fileName));
 			final ByteArrayOutputStream baos = new ByteArrayOutputStream();
 			final FileFormat format = getFileFormat();
-			final DiagramDescription desc = sourceStringReader.generateDiagramDescription(new FileFormatOption(format));
+			final FileFormatOption fileFormatOption = new FileFormatOption(format);
+			final DiagramDescription desc = sourceStringReader.generateDiagramDescription(fileFormatOption);
 			final List<BlockUml> blocks = sourceStringReader.getBlocks();
-			if (blocks.size() > 0) {
-				blocks.get(0).getDiagram().exportDiagram(baos, 0, new FileFormatOption(format));
-			}
+			if (blocks.size() > 0)
+				blocks.get(0).getDiagram().exportDiagram(baos, 0, fileFormatOption);
+
 			final String errorFileName = pngFileName.substring(0, pngFileName.length() - 4) + ".err";
 			synchronized (this) {
 				outgoing.remove(pngFileName);
@@ -178,9 +172,9 @@ public class FtpConnexion {
 				}
 			}
 		} finally {
-			if (done == false) {
+			if (done == false)
 				outgoing.put(pngFileName, new byte[0]);
-			}
+
 		}
 	}
 

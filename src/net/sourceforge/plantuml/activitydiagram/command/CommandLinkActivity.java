@@ -2,14 +2,14 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2023, Arnaud Roques
+ * (C) Copyright 2009-2024, Arnaud Roques
  *
- * Project Info:  http://plantuml.com
+ * Project Info:  https://plantuml.com
  * 
  * If you like this project or if you find it useful, you can support us at:
  * 
- * http://plantuml.com/patreon (only 1$ per month!)
- * http://plantuml.com/paypal
+ * https://plantuml.com/patreon (only 1$ per month!)
+ * https://plantuml.com/paypal
  * 
  * This file is part of PlantUML.
  *
@@ -35,40 +35,38 @@
  */
 package net.sourceforge.plantuml.activitydiagram.command;
 
-import net.sourceforge.plantuml.Direction;
-import net.sourceforge.plantuml.LineLocation;
 import net.sourceforge.plantuml.StringUtils;
-import net.sourceforge.plantuml.Url;
-import net.sourceforge.plantuml.UrlBuilder;
-import net.sourceforge.plantuml.UrlMode;
+import net.sourceforge.plantuml.abel.Entity;
+import net.sourceforge.plantuml.abel.GroupType;
+import net.sourceforge.plantuml.abel.LeafType;
+import net.sourceforge.plantuml.abel.Link;
+import net.sourceforge.plantuml.abel.LinkArg;
 import net.sourceforge.plantuml.activitydiagram.ActivityDiagram;
 import net.sourceforge.plantuml.classdiagram.command.CommandLinkClass;
 import net.sourceforge.plantuml.command.CommandExecutionResult;
 import net.sourceforge.plantuml.command.SingleLineCommand2;
-import net.sourceforge.plantuml.command.regex.IRegex;
-import net.sourceforge.plantuml.command.regex.RegexConcat;
-import net.sourceforge.plantuml.command.regex.RegexLeaf;
-import net.sourceforge.plantuml.command.regex.RegexOptional;
-import net.sourceforge.plantuml.command.regex.RegexOr;
-import net.sourceforge.plantuml.command.regex.RegexPartialMatch;
-import net.sourceforge.plantuml.command.regex.RegexResult;
-import net.sourceforge.plantuml.cucadiagram.Code;
-import net.sourceforge.plantuml.cucadiagram.Display;
-import net.sourceforge.plantuml.cucadiagram.GroupType;
-import net.sourceforge.plantuml.cucadiagram.IEntity;
-import net.sourceforge.plantuml.cucadiagram.ILeaf;
-import net.sourceforge.plantuml.cucadiagram.Ident;
-import net.sourceforge.plantuml.cucadiagram.LeafType;
-import net.sourceforge.plantuml.cucadiagram.Link;
-import net.sourceforge.plantuml.cucadiagram.LinkArg;
-import net.sourceforge.plantuml.cucadiagram.LinkDecor;
-import net.sourceforge.plantuml.cucadiagram.LinkType;
-import net.sourceforge.plantuml.cucadiagram.NamespaceStrategy;
-import net.sourceforge.plantuml.cucadiagram.Stereotype;
+import net.sourceforge.plantuml.decoration.LinkDecor;
+import net.sourceforge.plantuml.decoration.LinkType;
 import net.sourceforge.plantuml.descdiagram.command.CommandLinkElement;
-import net.sourceforge.plantuml.graphic.color.ColorParser;
-import net.sourceforge.plantuml.graphic.color.ColorType;
-import net.sourceforge.plantuml.ugraphic.color.NoSuchColorException;
+import net.sourceforge.plantuml.klimt.color.ColorParser;
+import net.sourceforge.plantuml.klimt.color.ColorType;
+import net.sourceforge.plantuml.klimt.color.NoSuchColorException;
+import net.sourceforge.plantuml.klimt.creole.Display;
+import net.sourceforge.plantuml.plasma.Quark;
+import net.sourceforge.plantuml.regex.IRegex;
+import net.sourceforge.plantuml.regex.RegexConcat;
+import net.sourceforge.plantuml.regex.RegexLeaf;
+import net.sourceforge.plantuml.regex.RegexOptional;
+import net.sourceforge.plantuml.regex.RegexOr;
+import net.sourceforge.plantuml.regex.RegexPartialMatch;
+import net.sourceforge.plantuml.regex.RegexResult;
+import net.sourceforge.plantuml.stereo.Stereotype;
+import net.sourceforge.plantuml.stereo.StereotypePattern;
+import net.sourceforge.plantuml.url.Url;
+import net.sourceforge.plantuml.url.UrlBuilder;
+import net.sourceforge.plantuml.url.UrlMode;
+import net.sourceforge.plantuml.utils.Direction;
+import net.sourceforge.plantuml.utils.LineLocation;
 
 public class CommandLinkActivity extends SingleLineCommand2<ActivityDiagram> {
 
@@ -84,12 +82,10 @@ public class CommandLinkActivity extends SingleLineCommand2<ActivityDiagram> {
 								new RegexLeaf("CODE", "([%pLN][%pLN_.]*)"), //
 								new RegexLeaf("BAR", "(?:==+)[%s]*([%pLN_.]+)[%s]*(?:==+)"), //
 								new RegexLeaf("QUOTED", "[%g]([^%g]+)[%g](?:[%s]+as[%s]+([%pLN_.]+))?"))), //
-				RegexLeaf.spaceZeroOrMore(), //
-				new RegexLeaf("STEREOTYPE", "(\\<\\<.*\\>\\>)?"), //
-				RegexLeaf.spaceZeroOrMore(), //
+				StereotypePattern.optional("STEREOTYPE"), //
 				ColorParser.exp2(), //
 				RegexLeaf.spaceZeroOrMore(), //
-				new RegexLeaf("URL", "(" + UrlBuilder.getRegexp() + ")?"), //
+				UrlBuilder.OPTIONAL, //
 
 				new RegexLeaf("ARROW_BODY1", "([-.]+)"), //
 				new RegexLeaf("ARROW_STYLE1", "(?:\\[(" + CommandLinkElement.LINE_STYLE + ")\\])?"), //
@@ -108,9 +104,7 @@ public class CommandLinkActivity extends SingleLineCommand2<ActivityDiagram> {
 						new RegexLeaf("BAR2", "(?:==+)[%s]*([%pLN_.]+)[%s]*(?:==+)"), //
 						new RegexLeaf("QUOTED2", "[%g]([^%g]+)[%g](?:[%s]+as[%s]+([%pLN][%pLN_.]*))?"), //
 						new RegexLeaf("QUOTED_INVISIBLE2", "(\\w.*?)")), //
-				RegexLeaf.spaceZeroOrMore(), //
-				new RegexLeaf("STEREOTYPE2", "(\\<\\<.*\\>\\>)?"), //
-				RegexLeaf.spaceZeroOrMore(), //
+				StereotypePattern.optional("STEREOTYPE2"), //
 				new RegexOptional( //
 						new RegexConcat( //
 								new RegexLeaf("in"), //
@@ -125,7 +119,8 @@ public class CommandLinkActivity extends SingleLineCommand2<ActivityDiagram> {
 	@Override
 	protected CommandExecutionResult executeArg(ActivityDiagram diagram, LineLocation location, RegexResult arg)
 			throws NoSuchColorException {
-		final IEntity entity1 = getEntity(diagram, arg, true);
+		final Entity entity1 = getEntity(diagram, arg, true);
+
 		if (entity1 == null)
 			return CommandExecutionResult.error("No such activity");
 
@@ -134,18 +129,18 @@ public class CommandLinkActivity extends SingleLineCommand2<ActivityDiagram> {
 
 		if (arg.get("BACKCOLOR", 0) != null) {
 			String s = arg.get("BACKCOLOR", 0);
-			entity1.setSpecificColorTOBEREMOVED(ColorType.BACK,
-					diagram.getSkinParam().getIHtmlColorSet().getColor(diagram.getSkinParam().getThemeStyle(), s));
+			entity1.setSpecificColorTOBEREMOVED(ColorType.BACK, diagram.getSkinParam().getIHtmlColorSet().getColor(s));
 		}
 
-		final IEntity entity2 = getEntity(diagram, arg, false);
+		final Entity entity2 = getEntity(diagram, arg, false);
 		if (entity2 == null)
 			return CommandExecutionResult.error("No such activity");
 
+		diagram.setLastEntityConsulted(entity2);
+
 		if (arg.get("BACKCOLOR2", 0) != null) {
 			String s = arg.get("BACKCOLOR2", 0);
-			entity2.setSpecificColorTOBEREMOVED(ColorType.BACK,
-					diagram.getSkinParam().getIHtmlColorSet().getColor(diagram.getSkinParam().getThemeStyle(), s));
+			entity2.setSpecificColorTOBEREMOVED(ColorType.BACK, diagram.getSkinParam().getIHtmlColorSet().getColor(s));
 		}
 		if (arg.get("STEREOTYPE2", 0) != null)
 			entity2.setStereotype(Stereotype.build(arg.get("STEREOTYPE2", 0)));
@@ -166,7 +161,8 @@ public class CommandLinkActivity extends SingleLineCommand2<ActivityDiagram> {
 			type = type.goDotted();
 
 		final LinkArg linkArg = LinkArg.build(linkLabel, lenght, diagram.getSkinParam().classAttributeIconSize() > 0);
-		Link link = new Link(diagram.getSkinParam().getCurrentStyleBuilder(), entity1, entity2, type, linkArg);
+		Link link = new Link(diagram.getEntityFactory(), diagram.getSkinParam().getCurrentStyleBuilder(), entity1,
+				entity2, type, linkArg);
 		if (arrowDirection.contains("*"))
 			link.setConstraint(false);
 
@@ -180,14 +176,14 @@ public class CommandLinkActivity extends SingleLineCommand2<ActivityDiagram> {
 			link.setUrl(urlLink);
 		}
 
-		link.applyStyle(diagram.getSkinParam().getThemeStyle(), arg.getLazzy("ARROW_STYLE", 0));
+		link.applyStyle(arg.getLazzy("ARROW_STYLE", 0));
 		diagram.addLink(link);
 
 		return CommandExecutionResult.ok();
 
 	}
 
-	static IEntity getEntity(ActivityDiagram diagram, RegexResult arg, final boolean start) {
+	static Entity getEntity(ActivityDiagram diagram, RegexResult arg, final boolean start) {
 		final String suf = start ? "" : "2";
 
 		final String openBracket2 = arg.get("OPENBRACKET" + suf, 0);
@@ -210,22 +206,16 @@ public class CommandLinkActivity extends SingleLineCommand2<ActivityDiagram> {
 		final String idShort = arg.get("CODE" + suf, 0);
 		if (idShort != null) {
 			if (partition != null) {
-				final Ident idNewLong = diagram.buildLeafIdent(partition);
-				final Code codeP = diagram.V1972() ? idNewLong : diagram.buildCode(partition);
-				diagram.gotoGroup(idNewLong, codeP, Display.getWithNewlines(partition), GroupType.PACKAGE,
-						diagram.getRootGroup(), NamespaceStrategy.SINGLE);
+				final Quark<Entity> quark = diagram.quarkInContext(true, diagram.cleanId(partition));
+				diagram.gotoGroup(quark, Display.getWithNewlines(quark), GroupType.PACKAGE);
 			}
-			final Ident ident = diagram.buildLeafIdent(idShort);
-			final Code code = diagram.V1972() ? ident : diagram.buildCode(idShort);
-			final LeafType type = diagram.V1972() ? getTypeIfExistingSmart(diagram, ident)
-					: getTypeIfExisting(diagram, code);
-			IEntity result;
-			if (diagram.V1972()) {
-				result = diagram.getLeafVerySmart(ident);
-				if (result == null)
-					result = diagram.getOrCreate(ident, code, Display.getWithNewlines(code), type);
-			} else
-				result = diagram.getOrCreate(ident, code, Display.getWithNewlines(code), type);
+			final Quark<Entity> ident = diagram.quarkInContext(true, diagram.cleanId(idShort));
+
+			final LeafType type = getTypeIfExisting(diagram, ident);
+			Entity result = ident.getData();
+			if (result == null)
+				result = diagram.reallyCreateLeaf(ident, Display.getWithNewlines(idShort), type, null);
+
 			if (partition != null)
 				diagram.endGroup();
 
@@ -233,31 +223,26 @@ public class CommandLinkActivity extends SingleLineCommand2<ActivityDiagram> {
 		}
 		final String bar = arg.get("BAR" + suf, 0);
 		if (bar != null) {
-			final Ident identBar = diagram.buildLeafIdent(bar);
-			final Code codeBar = diagram.V1972() ? identBar : diagram.buildCode(bar);
-			if (diagram.V1972()) {
-				final ILeaf result = diagram.getLeafVerySmart(identBar);
-				if (result != null)
-					return result;
-
-			}
-			return diagram.getOrCreate(identBar, codeBar, Display.getWithNewlines(bar), LeafType.SYNCHRO_BAR);
+			final Quark<Entity> quark = diagram.quarkInContext(true, diagram.cleanId(bar));
+			Entity result = quark.getData();
+			if (result == null)
+				result = diagram.reallyCreateLeaf(quark, Display.getWithNewlines(bar), LeafType.SYNCHRO_BAR, null);
+			return result;
 		}
 		final RegexPartialMatch quoted = arg.get("QUOTED" + suf);
 		if (quoted.get(0) != null) {
 			final String quotedString = quoted.get(1) == null ? quoted.get(0) : quoted.get(1);
 			if (partition != null) {
-				final Ident idNewLong = diagram.buildLeafIdent(partition);
-				final Code codeP = diagram.V1972() ? idNewLong : diagram.buildCode(partition);
-				diagram.gotoGroup(idNewLong, codeP, Display.getWithNewlines(partition), GroupType.PACKAGE,
-						diagram.getRootGroup(), NamespaceStrategy.SINGLE);
+				final Quark<Entity> quark = diagram.quarkInContext(true, diagram.cleanId(partition));
+				diagram.gotoGroup(quark, Display.getWithNewlines(partition), GroupType.PACKAGE);
 			}
-			final Ident quotedIdent = diagram.buildLeafIdent(quotedString);
-			final Code quotedCode = diagram.V1972() ? quotedIdent : diagram.buildCode(quotedString);
-			final LeafType type = diagram.V1972() ? getTypeIfExistingSmart(diagram, quotedIdent)
-					: getTypeIfExisting(diagram, quotedCode);
-			final IEntity result = diagram.getOrCreate(quotedIdent, quotedCode, Display.getWithNewlines(quoted.get(0)),
-					type);
+
+			final Quark<Entity> quark = diagram.quarkInContext(true, diagram.cleanId(quotedString));
+
+			final LeafType type = getTypeIfExisting(diagram, quark);
+			Entity result = quark.getData();
+			if (result == null)
+				result = diagram.reallyCreateLeaf(quark, Display.getWithNewlines(quoted.get(0)), type, null);
 			if (partition != null)
 				diagram.endGroup();
 
@@ -266,15 +251,14 @@ public class CommandLinkActivity extends SingleLineCommand2<ActivityDiagram> {
 		final String quoteInvisibleString = arg.get("QUOTED_INVISIBLE" + suf, 0);
 		if (quoteInvisibleString != null) {
 			if (partition != null) {
-				final Ident idNewLong = diagram.buildLeafIdent(partition);
-				final Code codeP = diagram.V1972() ? idNewLong : diagram.buildCode(partition);
-				diagram.gotoGroup(idNewLong, codeP, Display.getWithNewlines(partition), GroupType.PACKAGE,
-						diagram.getRootGroup(), NamespaceStrategy.SINGLE);
+				final Quark<Entity> quark = diagram.quarkInContext(true, diagram.cleanId(partition));
+				diagram.gotoGroup(quark, Display.getWithNewlines(quark), GroupType.PACKAGE);
 			}
-			final Ident identInvisible = diagram.buildLeafIdent(quoteInvisibleString);
-			final Code quotedInvisible = diagram.V1972() ? identInvisible : diagram.buildCode(quoteInvisibleString);
-			final IEntity result = diagram.getOrCreate(identInvisible, quotedInvisible,
-					Display.getWithNewlines(quotedInvisible), LeafType.ACTIVITY);
+			final Quark<Entity> identInvisible = diagram.quarkInContext(true, diagram.cleanId(quoteInvisibleString));
+			Entity result = identInvisible.getData();
+			if (result == null)
+				result = diagram.reallyCreateLeaf(identInvisible, Display.getWithNewlines(identInvisible.getName()),
+						LeafType.ACTIVITY, null);
 			if (partition != null)
 				diagram.endGroup();
 
@@ -287,22 +271,13 @@ public class CommandLinkActivity extends SingleLineCommand2<ActivityDiagram> {
 		return null;
 	}
 
-	private static LeafType getTypeIfExistingSmart(ActivityDiagram system, Ident ident) {
-		final IEntity ent = system.getLeafSmart(ident);
-		if (ent != null)
-			if (ent.getLeafType() == LeafType.BRANCH)
-				return LeafType.BRANCH;
-
-		return LeafType.ACTIVITY;
-	}
-
-	private static LeafType getTypeIfExisting(ActivityDiagram system, Code code) {
-		if (system.leafExist(code)) {
-			final IEntity ent = system.getLeaf(code);
-			if (ent.getLeafType() == LeafType.BRANCH)
-				return LeafType.BRANCH;
-
-		}
+	private static LeafType getTypeIfExisting(ActivityDiagram system, Quark<Entity> code) {
+//		if (code.getData() == null) {
+//			final Quark quark = system.getPlasma().getIfExistsFromName(code.getName());
+//			final IEntity ent = quark == null ? null : (ILeaf) quark.getData();
+//			if (ent.getLeafType() == LeafType.BRANCH)
+//				return LeafType.BRANCH;
+//		}
 		return LeafType.ACTIVITY;
 	}
 

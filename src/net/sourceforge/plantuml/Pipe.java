@@ -2,14 +2,14 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2023, Arnaud Roques
+ * (C) Copyright 2009-2024, Arnaud Roques
  *
- * Project Info:  http://plantuml.com
+ * Project Info:  https://plantuml.com
  * 
  * If you like this project or if you find it useful, you can support us at:
  * 
- * http://plantuml.com/patreon (only 1$ per month!)
- * http://plantuml.com/paypal
+ * https://plantuml.com/patreon (only 1$ per month!)
+ * https://plantuml.com/paypal
  * 
  * This file is part of PlantUML.
  *
@@ -47,6 +47,8 @@ import java.io.PrintStream;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import net.sourceforge.plantuml.core.Diagram;
 import net.sourceforge.plantuml.core.DiagramDescription;
@@ -55,6 +57,8 @@ import net.sourceforge.plantuml.preproc.Defines;
 import net.sourceforge.plantuml.security.SFile;
 
 public class Pipe {
+	// ::remove file when __CORE__
+	// ::remove file when __HAXE__
 
 	private final Option option;
 	private final BufferedReader br;
@@ -76,26 +80,27 @@ public class Pipe {
 	public void managePipe(ErrorStatus error) throws IOException {
 		final boolean noStdErr = option.isPipeNoStdErr();
 
-		for(String source = readFirstDiagram(); source != null; source = readSubsequentDiagram()) {
+		for (String source = readFirstDiagram(); source != null; source = readSubsequentDiagram()) {
 			final Defines defines = option.getDefaultDefines();
 			final SFile newCurrentDir = option.getFileDir() == null ? null : new SFile(option.getFileDir());
 			final SourceStringReader sourceStringReader = new SourceStringReader(defines, source, UTF_8,
 					option.getConfig(), newCurrentDir);
 
-			if (option.isComputeurl()) {
+			if (option.isComputeurl())
 				computeUrlForDiagram(sourceStringReader);
-			} else if (option.isSyntax()) {
+			else if (option.isSyntax())
 				syntaxCheckDiagram(sourceStringReader, error);
-			} else if (option.isPipeMap()) {
+			else if (option.isPipeMap())
 				createPipeMapForDiagram(sourceStringReader, error);
-			} else {
+			else
 				generateDiagram(sourceStringReader, error, noStdErr);
-			}
+
 			ps.flush();
 		}
 	}
 
-	private void generateDiagram(SourceStringReader sourceStringReader, ErrorStatus error, boolean noStdErr) throws IOException {
+	private void generateDiagram(SourceStringReader sourceStringReader, ErrorStatus error, boolean noStdErr)
+			throws IOException {
 		final OutputStream os = noStdErr ? new ByteArrayOutputStream() : ps;
 		final DiagramDescription result = sourceStringReader.outputImage(os, option.getImageIndex(),
 				option.getFileFormatOption());
@@ -111,28 +116,29 @@ public class Pipe {
 				ps.write(baos.toByteArray());
 			}
 		}
-		if (option.getPipeDelimitor() != null) {
+		if (option.getPipeDelimitor() != null)
 			ps.println(option.getPipeDelimitor());
-		}
+
 	}
 
 	private void createPipeMapForDiagram(SourceStringReader sourceStringReader, ErrorStatus error) throws IOException {
-		final String result = sourceStringReader.getCMapData(option.getImageIndex(),
-				option.getFileFormatOption());
+		final String result = sourceStringReader.getCMapData(option.getImageIndex(), option.getFileFormatOption());
 		// https://forum.plantuml.net/10049/2019-pipemap-diagrams-containing-links-give-zero-exit-code
 		// We don't check errors
 		error.goOk();
 		if (result == null) {
+//			final CMapData empty = new CMapData();
+//			ps.println(empty.asString("plantuml"));
 			ps.println();
-		} else {
+		} else
 			ps.println(result);
-		}
+
 	}
 
 	private void computeUrlForDiagram(SourceStringReader sourceStringReader) throws IOException {
-		for (BlockUml s : sourceStringReader.getBlocks()) {
+		for (BlockUml s : sourceStringReader.getBlocks())
 			ps.println(s.getEncodedUrl());
-		}
+
 	}
 
 	private void syntaxCheckDiagram(SourceStringReader sourceStringReader, ErrorStatus error) {
@@ -153,11 +159,11 @@ public class Pipe {
 
 	private void printInfo(final PrintStream output, final SourceStringReader sourceStringReader) {
 		final List<BlockUml> blocks = sourceStringReader.getBlocks();
-		if (blocks.size() == 0) {
+		if (blocks.size() == 0)
 			stdrpt.printInfo(output, null);
-		} else {
+		else
 			stdrpt.printInfo(output, blocks.get(0).getDiagram());
-		}
+
 	}
 
 	String readFirstDiagram() throws IOException {
@@ -174,55 +180,56 @@ public class Pipe {
 		final StringBuilder sb = new StringBuilder();
 
 		String line;
-		while(state != State.COMPLETE && (line = br.readLine()) != null) {
+		while (state != State.COMPLETE && (line = br.readLine()) != null) {
 
-			if(line.startsWith("@@@format ")) {
+			if (line.startsWith("@@@format ")) {
 				manageFormat(line);
 			} else {
-				if (state == State.NO_CONTENT && line.trim().length() > 0) {
+				if (state == State.NO_CONTENT && line.trim().length() > 0)
 					state = State.START_MARK_NOT_FOUND;
-				}
 
 				if (state == State.START_MARK_NOT_FOUND && line.startsWith("@start")) {
 					sb.setLength(0); // discard any previous input
 					state = State.START_MARK_FOUND;
-					expectedEnd = "@end" + line.substring(6).split("^[A-Za-z]")[0];
+					final Matcher m = Pattern.compile("@start([A-Za-z]*)").matcher(line);
+					if (m.matches())
+						expectedEnd = "@end" + m.group(1);
+					else
+						expectedEnd = "@end";
+
 				} else if (state == State.START_MARK_FOUND && line.startsWith(expectedEnd)) {
 					state = State.COMPLETE;
 				}
 
-				if (state != State.NO_CONTENT) {
+				if (state != State.NO_CONTENT)
 					sb.append(line).append("\n");
-				}
+
 			}
 		}
 
-		switch(state) {
-			case NO_CONTENT:
-				return null;
-			case START_MARK_NOT_FOUND:
-				return (unmarkedAllowed) ? "@startuml\n" + sb.toString() + "@enduml\n" : null;
-			case START_MARK_FOUND:
-				return sb.toString() + expectedEnd;
-			case COMPLETE:
-				return sb.toString();
-			default:
-				throw new IllegalStateException("Unexpected value: " + state);
+		switch (state) {
+		case NO_CONTENT:
+			return null;
+		case START_MARK_NOT_FOUND:
+			return (unmarkedAllowed) ? "@startuml\n" + sb.toString() + "@enduml\n" : null;
+		case START_MARK_FOUND:
+			return sb.toString() + expectedEnd;
+		case COMPLETE:
+			return sb.toString();
+		default:
+			throw new IllegalStateException("Unexpected value: " + state);
 		}
 	}
 
 	void manageFormat(String s) {
-		if (s.contains("png")) {
+		if (s.contains("png"))
 			option.setFileFormatOption(new FileFormatOption(FileFormat.PNG));
-		} else if (s.contains("svg")) {
+		else if (s.contains("svg"))
 			option.setFileFormatOption(new FileFormatOption(FileFormat.SVG));
-		}
+
 	}
 
-	 enum State {
-		NO_CONTENT,
-		START_MARK_NOT_FOUND,
-		START_MARK_FOUND,
-		COMPLETE
+	enum State {
+		NO_CONTENT, START_MARK_NOT_FOUND, START_MARK_FOUND, COMPLETE
 	}
 }

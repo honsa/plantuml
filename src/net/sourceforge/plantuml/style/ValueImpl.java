@@ -2,14 +2,14 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2023, Arnaud Roques
+ * (C) Copyright 2009-2024, Arnaud Roques
  *
- * Project Info:  http://plantuml.com
+ * Project Info:  https://plantuml.com
  * 
  * If you like this project or if you find it useful, you can support us at:
  * 
- * http://plantuml.com/patreon (only 1$ per month!)
- * http://plantuml.com/paypal
+ * https://plantuml.com/patreon (only 1$ per month!)
+ * https://plantuml.com/paypal
  * 
  * This file is part of PlantUML.
  *
@@ -38,13 +38,13 @@ package net.sourceforge.plantuml.style;
 import java.awt.Font;
 import java.util.Objects;
 
-import net.sourceforge.plantuml.api.ThemeStyle;
-import net.sourceforge.plantuml.graphic.HorizontalAlignment;
-import net.sourceforge.plantuml.ugraphic.color.HColor;
-import net.sourceforge.plantuml.ugraphic.color.HColorSet;
-import net.sourceforge.plantuml.ugraphic.color.HColors;
+import net.sourceforge.plantuml.klimt.color.HColor;
+import net.sourceforge.plantuml.klimt.color.HColorSet;
+import net.sourceforge.plantuml.klimt.color.HColors;
+import net.sourceforge.plantuml.klimt.geom.HorizontalAlignment;
 
 public class ValueImpl implements Value {
+    // ::remove file when __HAXE__
 
 	private final DarkString value;
 
@@ -90,10 +90,10 @@ public class ValueImpl implements Value {
 		return value.getValue1();
 	}
 
-	public HColor asColor(ThemeStyle themeStyle, HColorSet set) {
+	public HColor asColor(HColorSet set) {
 		final String value1 = value.getValue1();
 		if ("none".equalsIgnoreCase(value1))
-			return null;
+			return HColors.transparent();
 
 		if ("transparent".equalsIgnoreCase(value1))
 			return HColors.transparent();
@@ -101,9 +101,9 @@ public class ValueImpl implements Value {
 		if (value1 == null)
 			throw new IllegalArgumentException(value.toString());
 
-		final HColor result = set.getColorOrWhite(themeStyle, value1);
+		final HColor result = set.getColorOrWhite(value1);
 		if (value.getValue2() != null) {
-			final HColor dark = set.getColorOrWhite(themeStyle, value.getValue2());
+			final HColor dark = set.getColorOrWhite(value.getValue2());
 			return result.withDark(dark);
 		}
 		return result;
@@ -113,12 +113,18 @@ public class ValueImpl implements Value {
 		return "true".equalsIgnoreCase(value.getValue1());
 	}
 
-	public int asInt() {
-		return Integer.parseInt(value.getValue1());
+	public int asInt(boolean minusOneIfError) {
+		String s = value.getValue1();
+		s = s.replaceAll("[^0-9]", "");
+		if (s.length() == 0)
+			return minusOneIfError ? -1 : 0;
+		return Integer.parseInt(s);
 	}
 
 	public double asDouble() {
-		return Double.parseDouble(value.getValue1());
+		String s = value.getValue1();
+		s = s.replaceAll("[^.0-9]", "");
+		return Double.parseDouble(s);
 	}
 
 	public int asFontStyle() {

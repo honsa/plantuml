@@ -1,6 +1,7 @@
 root {
   FontName SansSerif
   HyperLinkColor blue
+  HyperLinkUnderlineThickness 1
   FontColor black
   FontSize 14
   FontStyle plain
@@ -261,6 +262,12 @@ stateDiagram {
 	  FontStyle plain
 	}
   }
+  circle {
+    start, stop, end {
+	    LineColor black
+	    BackgroundColor black
+    }
+  }
 }
 
 
@@ -310,7 +317,7 @@ collections {
 }
 
 swimlane {
-  BackGroundColor none
+  BackGroundColor transparent
   LineColor black
   LineThickness 2
   FontSize 18
@@ -370,9 +377,9 @@ activityDiagram {
 	    FontSize 12
 	    RoundCorner 25
 	}
-	partition {
+	composite {
 	    LineColor black
-	    BackgroundColor none
+	    BackgroundColor transparent
 	}
 	diamond {
 	    FontSize 11
@@ -381,17 +388,9 @@ activityDiagram {
 	    FontSize 11
 	}
 	circle {
-	    start {
+	    start, stop, end {
 		    LineColor black
 		    BackgroundColor black
-	    }
-	    stop {
-		    LineColor black
-		    BackgroundColor white
-	    }
-	    end {
-		    LineColor black
-		    BackgroundColor white
 	    }
 	}
 	activityBar {
@@ -459,7 +458,7 @@ yamlDiagram,jsonDiagram {
   LineColor black
   arrow {
     LineThickness 1
-    LineStyle 3;3
+    LineStyle 3-3
   }
   node {
     LineThickness 1.5
@@ -516,7 +515,7 @@ timingDiagram {
 	highlight {
 	  BackgroundColor #e
 	  LineThickness 2
-	  LineStyle 4;4
+	  LineStyle 4-4
 	}
 }
 

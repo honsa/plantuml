@@ -2,14 +2,14 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2023, Arnaud Roques
+ * (C) Copyright 2009-2024, Arnaud Roques
  *
- * Project Info:  http://plantuml.com
+ * Project Info:  https://plantuml.com
  *
  * If you like this project or if you find it useful, you can support us at:
  *
- * http://plantuml.com/patreon (only 1$ per month!)
- * http://plantuml.com/paypal
+ * https://plantuml.com/patreon (only 1$ per month!)
+ * https://plantuml.com/paypal
  *
  * This file is part of PlantUML.
  *
@@ -49,8 +49,6 @@ import java.util.Set;
 
 import net.sourceforge.plantuml.DefinitionsContainer;
 import net.sourceforge.plantuml.FileSystem;
-import net.sourceforge.plantuml.LineLocation;
-import net.sourceforge.plantuml.StringLocated;
 import net.sourceforge.plantuml.command.CommandExecutionResult;
 import net.sourceforge.plantuml.json.Json;
 import net.sourceforge.plantuml.json.JsonValue;
@@ -68,6 +66,8 @@ import net.sourceforge.plantuml.preproc2.PreprocessorIncludeStrategy;
 import net.sourceforge.plantuml.preproc2.PreprocessorUtils;
 import net.sourceforge.plantuml.security.SFile;
 import net.sourceforge.plantuml.security.SURL;
+import net.sourceforge.plantuml.text.StringLocated;
+import net.sourceforge.plantuml.text.TLineType;
 import net.sourceforge.plantuml.theme.ThemeUtils;
 import net.sourceforge.plantuml.tim.expression.Knowledge;
 import net.sourceforge.plantuml.tim.expression.TValue;
@@ -97,6 +97,7 @@ import net.sourceforge.plantuml.tim.stdlib.Feature;
 import net.sourceforge.plantuml.tim.stdlib.FileExists;
 import net.sourceforge.plantuml.tim.stdlib.Filename;
 import net.sourceforge.plantuml.tim.stdlib.FunctionExists;
+import net.sourceforge.plantuml.tim.stdlib.GetAllTheme;
 import net.sourceforge.plantuml.tim.stdlib.GetJsonKey;
 import net.sourceforge.plantuml.tim.stdlib.GetJsonType;
 import net.sourceforge.plantuml.tim.stdlib.GetVariableValue;
@@ -111,10 +112,18 @@ import net.sourceforge.plantuml.tim.stdlib.IsLight;
 import net.sourceforge.plantuml.tim.stdlib.JsonKeyExists;
 import net.sourceforge.plantuml.tim.stdlib.Lighten;
 import net.sourceforge.plantuml.tim.stdlib.LoadJson;
+import net.sourceforge.plantuml.tim.stdlib.LogicalAnd;
+import net.sourceforge.plantuml.tim.stdlib.LogicalNand;
+import net.sourceforge.plantuml.tim.stdlib.LogicalNor;
 import net.sourceforge.plantuml.tim.stdlib.LogicalNot;
+import net.sourceforge.plantuml.tim.stdlib.LogicalNxor;
+import net.sourceforge.plantuml.tim.stdlib.LogicalOr;
+import net.sourceforge.plantuml.tim.stdlib.LogicalXor;
 import net.sourceforge.plantuml.tim.stdlib.Lower;
 import net.sourceforge.plantuml.tim.stdlib.Newline;
 import net.sourceforge.plantuml.tim.stdlib.Now;
+import net.sourceforge.plantuml.tim.stdlib.Ord;
+import net.sourceforge.plantuml.tim.stdlib.RandomFunction;
 import net.sourceforge.plantuml.tim.stdlib.RetrieveProcedure;
 import net.sourceforge.plantuml.tim.stdlib.ReverseColor;
 import net.sourceforge.plantuml.tim.stdlib.ReverseHsluvColor;
@@ -127,6 +136,7 @@ import net.sourceforge.plantuml.tim.stdlib.Strpos;
 import net.sourceforge.plantuml.tim.stdlib.Substr;
 import net.sourceforge.plantuml.tim.stdlib.Upper;
 import net.sourceforge.plantuml.tim.stdlib.VariableExists;
+import net.sourceforge.plantuml.utils.LineLocation;
 
 public class TContext {
 
@@ -193,6 +203,15 @@ public class TContext {
 		functionsSet.addFunction(new SplitStr());
 		functionsSet.addFunction(new JsonKeyExists());
 		functionsSet.addFunction(new Now());
+		functionsSet.addFunction(new LogicalAnd());
+		functionsSet.addFunction(new LogicalOr());
+		functionsSet.addFunction(new LogicalXor());
+		functionsSet.addFunction(new LogicalNand());
+		functionsSet.addFunction(new LogicalNor());
+		functionsSet.addFunction(new LogicalNxor());
+		functionsSet.addFunction(new Ord());
+		functionsSet.addFunction(new RandomFunction());
+		functionsSet.addFunction(new GetAllTheme());
 		// %standard_exists_function
 		// %str_replace
 		// !exit
@@ -266,9 +285,9 @@ public class TContext {
 		try {
 			while ((s = it.peek()) != null) {
 				final TValue result = executeOneLineSafe(memory, s, ftype, modeSpecial);
-				if (result != null) {
+				if (result != null)
 					return result;
-				}
+
 				it.next();
 			}
 			return null;
@@ -428,9 +447,9 @@ public class TContext {
 		// https://en.wikipedia.org/wiki/String-searching_algorithm
 		// https://www.quora.com/What-is-the-most-efficient-algorithm-to-replace-all-occurrences-of-a-pattern-P-in-a-string-with-a-pattern-P
 		// https://en.wikipedia.org/wiki/Trie
-		if (memory.isEmpty() && functionsSet.size() == 0) {
+		if (memory.isEmpty() && functionsSet.size() == 0)
 			return str;
-		}
+
 		final StringBuilder result = new StringBuilder();
 		for (int i = 0; i < str.length(); i++) {
 			final char c = str.charAt(i);
@@ -647,6 +666,10 @@ public class TContext {
 				reader = PreprocessorUtils.getReaderIncludeUrl(url, s, suf, charset);
 			} else if (location.startsWith("<") && location.endsWith(">")) {
 				reader = PreprocessorUtils.getReaderStdlibInclude(s, location.substring(1, location.length() - 1));
+				// ::comment when __CORE__
+			} else if (location.startsWith("[") && location.endsWith("]")) {
+				reader = PreprocessorUtils.getReaderNonstandardInclude(s, location.substring(1, location.length() - 1));
+				// ::done
 			} else {
 				final FileWithSuffix f2 = importedFiles.getFile(location, suf);
 				if (f2.fileOk()) {

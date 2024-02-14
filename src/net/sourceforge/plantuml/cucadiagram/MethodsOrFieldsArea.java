@@ -2,14 +2,14 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2023, Arnaud Roques
+ * (C) Copyright 2009-2024, Arnaud Roques
  *
- * Project Info:  http://plantuml.com
+ * Project Info:  https://plantuml.com
  * 
  * If you like this project or if you find it useful, you can support us at:
  * 
- * http://plantuml.com/patreon (only 1$ per month!)
- * http://plantuml.com/paypal
+ * https://plantuml.com/patreon (only 1$ per month!)
+ * https://plantuml.com/paypal
  * 
  * This file is part of PlantUML.
  *
@@ -39,36 +39,41 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Iterator;
 import java.util.List;
 
+import net.atmp.InnerStrategy;
 import net.sourceforge.plantuml.EmbeddedDiagram;
-import net.sourceforge.plantuml.ISkinParam;
-import net.sourceforge.plantuml.Url;
-import net.sourceforge.plantuml.awt.geom.XDimension2D;
-import net.sourceforge.plantuml.awt.geom.XRectangle2D;
-import net.sourceforge.plantuml.creole.CreoleMode;
-import net.sourceforge.plantuml.graphic.AbstractTextBlock;
-import net.sourceforge.plantuml.graphic.FontConfiguration;
-import net.sourceforge.plantuml.graphic.HorizontalAlignment;
-import net.sourceforge.plantuml.graphic.InnerStrategy;
-import net.sourceforge.plantuml.graphic.StringBounder;
-import net.sourceforge.plantuml.graphic.TextBlock;
-import net.sourceforge.plantuml.graphic.TextBlockLineBefore;
-import net.sourceforge.plantuml.graphic.TextBlockUtils;
-import net.sourceforge.plantuml.graphic.TextBlockWithUrl;
+import net.sourceforge.plantuml.StringUtils;
+import net.sourceforge.plantuml.abel.Entity;
+import net.sourceforge.plantuml.klimt.UTranslate;
+import net.sourceforge.plantuml.klimt.color.HColor;
+import net.sourceforge.plantuml.klimt.creole.CreoleMode;
+import net.sourceforge.plantuml.klimt.creole.Display;
+import net.sourceforge.plantuml.klimt.drawing.UGraphic;
+import net.sourceforge.plantuml.klimt.font.FontConfiguration;
+import net.sourceforge.plantuml.klimt.font.StringBounder;
+import net.sourceforge.plantuml.klimt.geom.HorizontalAlignment;
+import net.sourceforge.plantuml.klimt.geom.PlacementStrategy;
+import net.sourceforge.plantuml.klimt.geom.PlacementStrategyVisibility;
+import net.sourceforge.plantuml.klimt.geom.PlacementStrategyY1Y2Center;
+import net.sourceforge.plantuml.klimt.geom.PlacementStrategyY1Y2Left;
+import net.sourceforge.plantuml.klimt.geom.PlacementStrategyY1Y2Right;
+import net.sourceforge.plantuml.klimt.geom.ULayoutGroup;
+import net.sourceforge.plantuml.klimt.geom.XDimension2D;
+import net.sourceforge.plantuml.klimt.geom.XRectangle2D;
+import net.sourceforge.plantuml.klimt.shape.AbstractTextBlock;
+import net.sourceforge.plantuml.klimt.shape.TextBlock;
+import net.sourceforge.plantuml.klimt.shape.TextBlockLineBefore;
+import net.sourceforge.plantuml.klimt.shape.TextBlockUtils;
+import net.sourceforge.plantuml.klimt.shape.TextBlockWithUrl;
 import net.sourceforge.plantuml.skin.VisibilityModifier;
+import net.sourceforge.plantuml.style.ISkinParam;
 import net.sourceforge.plantuml.style.PName;
 import net.sourceforge.plantuml.style.Style;
 import net.sourceforge.plantuml.svek.Ports;
 import net.sourceforge.plantuml.svek.WithPorts;
-import net.sourceforge.plantuml.ugraphic.PlacementStrategy;
-import net.sourceforge.plantuml.ugraphic.PlacementStrategyVisibility;
-import net.sourceforge.plantuml.ugraphic.PlacementStrategyY1Y2Center;
-import net.sourceforge.plantuml.ugraphic.PlacementStrategyY1Y2Left;
-import net.sourceforge.plantuml.ugraphic.PlacementStrategyY1Y2Right;
-import net.sourceforge.plantuml.ugraphic.UGraphic;
-import net.sourceforge.plantuml.ugraphic.ULayoutGroup;
-import net.sourceforge.plantuml.ugraphic.color.HColor;
+import net.sourceforge.plantuml.url.Url;
 import net.sourceforge.plantuml.utils.CharHidder;
 
 public class MethodsOrFieldsArea extends AbstractTextBlock implements TextBlock, WithPorts {
@@ -82,22 +87,37 @@ public class MethodsOrFieldsArea extends AbstractTextBlock implements TextBlock,
 
 	private final Display members;
 	private final HorizontalAlignment align;
+	private final List<EmbeddedDiagram> embeddeds = new ArrayList<>();
 
-	private final ILeaf leaf;
+	private final Entity leaf;
 	private final Style style;
 
-	public MethodsOrFieldsArea(Display members, ISkinParam skinParam, ILeaf leaf, Style style) {
+	public MethodsOrFieldsArea(Display members, ISkinParam skinParam, Entity leaf, Style style) {
 		this(members, skinParam, HorizontalAlignment.LEFT, leaf, style);
 	}
 
-	public MethodsOrFieldsArea(Display members, ISkinParam skinParam, HorizontalAlignment align, ILeaf leaf,
+	public MethodsOrFieldsArea(Display members, ISkinParam skinParam, HorizontalAlignment align, Entity leaf,
 			Style style) {
 		this.style = style;
 		this.leaf = leaf;
 
 		this.align = align;
 		this.skinParam = skinParam;
-		this.members = members;
+
+		final List<CharSequence> result = new ArrayList<>();
+		final Iterator<CharSequence> it = members.iterator();
+
+		while (it.hasNext()) {
+			final CharSequence cs = it.next();
+			final String type = EmbeddedDiagram.getEmbeddedType(StringUtils.trinNoTrace(cs));
+			if (type != null)
+				embeddeds.add(EmbeddedDiagram.createAndSkip(type, it, skinParam));
+			else
+				result.add(cs);
+
+		}
+
+		this.members = Display.create(result);
 	}
 
 	private boolean hasSmallIcon() {
@@ -115,7 +135,21 @@ public class MethodsOrFieldsArea extends AbstractTextBlock implements TextBlock,
 		return false;
 	}
 
+	@Override
 	public XDimension2D calculateDimension(StringBounder stringBounder) {
+		final XDimension2D dim1 = calculateDimensionOnlyMembers(stringBounder);
+		double x = dim1.getWidth();
+		double y = dim1.getHeight();
+		for (EmbeddedDiagram embedded : embeddeds) {
+			final XDimension2D dim = embedded.calculateDimension(stringBounder);
+			x = Math.max(dim.getWidth(), x);
+			y += dim.getHeight();
+		}
+
+		return new XDimension2D(x, y);
+	}
+
+	private XDimension2D calculateDimensionOnlyMembers(StringBounder stringBounder) {
 		double smallIcon = 0;
 		if (hasSmallIcon())
 			smallIcon = skinParam.getCircledCharacterRadius() + 3;
@@ -129,6 +163,7 @@ public class MethodsOrFieldsArea extends AbstractTextBlock implements TextBlock,
 			y += dim.getHeight();
 		}
 		x += smallIcon;
+
 		return new XDimension2D(x, y);
 	}
 
@@ -208,16 +243,16 @@ public class MethodsOrFieldsArea extends AbstractTextBlock implements TextBlock,
 				config = config.underline();
 
 			TextBlock bloc = Display.getWithNewlines(s).create8(config, align, skinParam, CreoleMode.SIMPLE_LINE,
-					skinParam.wrapWidth());
+					style.wrapWidth());
 			bloc = TextBlockUtils.fullInnerPosition(bloc, m.getDisplay(false));
 			return new TextBlockTracer(m, bloc);
 		}
 
-		if (cs instanceof EmbeddedDiagram)
-			return ((EmbeddedDiagram) cs).asDraw(skinParam);
+//		if (cs instanceof EmbeddedDiagram)
+//			return ((EmbeddedDiagram) cs).asDraw(skinParam);
 
 		return Display.getWithNewlines(cs.toString()).create8(config, align, skinParam, CreoleMode.SIMPLE_LINE,
-				skinParam.wrapWidth());
+				style.wrapWidth());
 
 	}
 
@@ -272,11 +307,10 @@ public class MethodsOrFieldsArea extends AbstractTextBlock implements TextBlock,
 			};
 		}
 		final Style style = modifier.getStyleSignature().getMergedStyle(skinParam.getCurrentStyleBuilder());
-		final HColor borderColor = style.value(PName.LineColor).asColor(skinParam.getThemeStyle(),
-				skinParam.getIHtmlColorSet());
+		final HColor borderColor = style.value(PName.LineColor).asColor(skinParam.getIHtmlColorSet());
 		final boolean isField = modifier.isField();
 		final HColor backColor = isField ? null
-				: style.value(PName.BackGroundColor).asColor(skinParam.getThemeStyle(), skinParam.getIHtmlColorSet());
+				: style.value(PName.BackGroundColor).asColor(skinParam.getIHtmlColorSet());
 
 		final TextBlock uBlock = modifier.getUBlock(skinParam.classAttributeIconSize(), borderColor, backColor,
 				url != null);
@@ -307,13 +341,13 @@ public class MethodsOrFieldsArea extends AbstractTextBlock implements TextBlock,
 					new PlacementStrategyVisibility(stringBounder, skinParam.getCircledCharacterRadius() + 3));
 			for (CharSequence cs : members) {
 				final TextBlock bloc = createTextBlock(cs);
-				if (cs instanceof EmbeddedDiagram) {
-					group.add(getUBlock(null, null));
-				} else {
-					final Member att = (Member) cs;
-					final VisibilityModifier modifier = att.getVisibilityModifier();
-					group.add(getUBlock(modifier, att.getUrl()));
-				}
+//				if (cs instanceof EmbeddedDiagram) {
+//					group.add(getUBlock(null, null));
+//				} else {
+				final Member att = (Member) cs;
+				final VisibilityModifier modifier = att.getVisibilityModifier();
+				group.add(getUBlock(modifier, att.getUrl()));
+//				}
 				group.add(bloc);
 			}
 		} else {
@@ -335,9 +369,16 @@ public class MethodsOrFieldsArea extends AbstractTextBlock implements TextBlock,
 	}
 
 	public void drawU(UGraphic ug) {
-		final ULayoutGroup group = getLayout(ug.getStringBounder());
-		final XDimension2D dim = calculateDimension(ug.getStringBounder());
+		final StringBounder stringBounder = ug.getStringBounder();
+		final ULayoutGroup group = getLayout(stringBounder);
+		final XDimension2D dim = calculateDimensionOnlyMembers(stringBounder);
 		group.drawU(ug, dim.getWidth(), dim.getHeight());
+		ug = ug.apply(UTranslate.dy(dim.getHeight()));
+
+		for (EmbeddedDiagram embedded : embeddeds) {
+			embedded.drawU(ug);
+			ug = ug.apply(UTranslate.dy(embedded.calculateDimension(stringBounder).getHeight()));
+		}
 	}
 
 }

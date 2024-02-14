@@ -2,14 +2,14 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2023, Arnaud Roques
+ * (C) Copyright 2009-2024, Arnaud Roques
  *
- * Project Info:  http://plantuml.com
+ * Project Info:  https://plantuml.com
  *
  * If you like this project or if you find it useful, you can support us at:
  *
- * http://plantuml.com/patreon (only 1$ per month!)
- * http://plantuml.com/paypal
+ * https://plantuml.com/patreon (only 1$ per month!)
+ * https://plantuml.com/paypal
  *
  * This file is part of PlantUML.
  *
@@ -42,28 +42,31 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
 
-import net.sourceforge.plantuml.Direction;
-import net.sourceforge.plantuml.awt.geom.XLine2D;
-import net.sourceforge.plantuml.awt.geom.XPoint2D;
-import net.sourceforge.plantuml.cucadiagram.LinkStyle;
-import net.sourceforge.plantuml.graphic.HtmlColorAndStyle;
+import net.sourceforge.plantuml.decoration.HtmlColorAndStyle;
+import net.sourceforge.plantuml.decoration.LinkStyle;
+import net.sourceforge.plantuml.klimt.Arrows;
+import net.sourceforge.plantuml.klimt.UStroke;
+import net.sourceforge.plantuml.klimt.UTranslate;
+import net.sourceforge.plantuml.klimt.color.HColor;
+import net.sourceforge.plantuml.klimt.compress.CompressionMode;
+import net.sourceforge.plantuml.klimt.drawing.UGraphic;
+import net.sourceforge.plantuml.klimt.geom.MinMax;
+import net.sourceforge.plantuml.klimt.geom.XLine2D;
+import net.sourceforge.plantuml.klimt.geom.XPoint2D;
+import net.sourceforge.plantuml.klimt.shape.ULine;
+import net.sourceforge.plantuml.klimt.shape.UPolygon;
 import net.sourceforge.plantuml.style.Style;
-import net.sourceforge.plantuml.ugraphic.MinMax;
-import net.sourceforge.plantuml.ugraphic.UGraphic;
-import net.sourceforge.plantuml.ugraphic.ULine;
-import net.sourceforge.plantuml.ugraphic.UPolygon;
-import net.sourceforge.plantuml.ugraphic.UStroke;
-import net.sourceforge.plantuml.ugraphic.UTranslate;
-import net.sourceforge.plantuml.ugraphic.color.HColor;
-import net.sourceforge.plantuml.ugraphic.comp.CompressionMode;
+import net.sourceforge.plantuml.utils.Direction;
 
 public class Worm implements Iterable<XPoint2D> {
 
 	private final List<XPoint2D> points = new ArrayList<>();
 	private final Style style;
+	private final Arrows arrows;
 
-	public Worm(Style style) {
+	public Worm(Style style, Arrows arrows) {
 		this.style = style;
+		this.arrows = arrows;
 	}
 
 	public boolean isPureHorizontal() {
@@ -73,7 +76,7 @@ public class Worm implements Iterable<XPoint2D> {
 	private boolean ignoreForCompression;
 
 	public Worm cloneEmpty() {
-		final Worm result = new Worm(style);
+		final Worm result = new Worm(style, arrows);
 		result.ignoreForCompression = this.ignoreForCompression;
 		return result;
 	}
@@ -103,7 +106,7 @@ public class Worm implements Iterable<XPoint2D> {
 		for (int i = 0; i < points.size() - 1; i++) {
 			final XPoint2D p1 = points.get(i);
 			final XPoint2D p2 = points.get(i + 1);
-			final XLine2D line = new XLine2D(p1, p2);
+			final XLine2D line = XLine2D.line(p1, p2);
 			if (drawn == false && emphasizeDirection != null && Direction.fromVector(p1, p2) == emphasizeDirection) {
 				drawLine(ug, line, emphasizeDirection);
 				drawn = true;
@@ -123,20 +126,20 @@ public class Worm implements Iterable<XPoint2D> {
 		ug = ug.apply(arrowHeadColor.bg());
 
 		if (startDecoration != null) {
-			ug = ug.apply(new UStroke(1.5));
+			ug = ug.apply(UStroke.withThickness(1.5));
 			final XPoint2D start = points.get(0);
 			if (ignoreForCompression)
 				startDecoration.setCompressionMode(CompressionMode.ON_X);
 
-			ug.apply(new UTranslate(start)).apply(new UStroke()).draw(startDecoration);
+			ug.apply(UTranslate.point(start)).apply(UStroke.simple()).draw(startDecoration);
 		}
 		if (endDecoration != null) {
-			ug = ug.apply(new UStroke(1.5));
+			ug = ug.apply(UStroke.withThickness(1.5));
 			final XPoint2D end = points.get(points.size() - 1);
 			if (ignoreForCompression)
 				endDecoration.setCompressionMode(CompressionMode.ON_X);
 
-			ug.apply(new UTranslate(end)).apply(new UStroke()).draw(endDecoration);
+			ug.apply(UTranslate.point(end)).apply(UStroke.simple()).draw(endDecoration);
 		}
 	}
 
@@ -147,13 +150,13 @@ public class Worm implements Iterable<XPoint2D> {
 	private void drawLine(UGraphic ug, double x1, double y1, double x2, double y2, Direction direction) {
 		ug = ug.apply(new UTranslate(x1, y1));
 		if (direction != null)
-			ug.apply(new UTranslate((x2 - x1) / 2, (y2 - y1) / 2)).draw(Arrows.asTo(direction));
+			ug.apply(new UTranslate((x2 - x1) / 2, (y2 - y1) / 2)).draw(arrows.asTo(direction));
 
 		ug.draw(new ULine(x2 - x1, y2 - y1));
 	}
 
 	public Worm move(double dx, double dy) {
-		final Worm result = new Worm(style);
+		final Worm result = new Worm(style, arrows);
 		for (XPoint2D pt : points)
 			result.addPoint(pt.getX() + dx, pt.getY() + dy);
 
@@ -166,7 +169,7 @@ public class Worm implements Iterable<XPoint2D> {
 		if (dx != 0 && dy != 0)
 			throw new IllegalArgumentException("move=" + move);
 
-		final Worm result = new Worm(style);
+		final Worm result = new Worm(style, arrows);
 		double x0 = this.points.get(0).getX();
 		double y0 = this.points.get(0).getY();
 		double x1 = this.points.get(1).getX();
@@ -195,7 +198,7 @@ public class Worm implements Iterable<XPoint2D> {
 		if (dx != 0 && dy != 0)
 			throw new IllegalArgumentException("move=" + move);
 
-		final Worm result = new Worm(style);
+		final Worm result = new Worm(style, arrows);
 		double x8 = this.points.get(this.points.size() - 2).getX();
 		double y8 = this.points.get(this.points.size() - 2).getY();
 		double x9 = this.points.get(this.points.size() - 1).getX();
@@ -330,11 +333,18 @@ public class Worm implements Iterable<XPoint2D> {
 		return result;
 	}
 
+	public double getMaxY() {
+		double result = points.get(0).getY();
+		for (XPoint2D pt : points)
+			result = Math.max(result, pt.getY());
+		return result;
+	}
+
 	public Worm merge(Worm other, MergeStrategy merge) {
 		if (Snake.same(this.getLast(), other.getFirst()) == false)
 			throw new IllegalArgumentException();
 
-		final Worm result = new Worm(style);
+		final Worm result = new Worm(style, arrows);
 		result.points.addAll(this.points);
 		result.points.addAll(other.points);
 		result.mergeMe(merge);

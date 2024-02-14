@@ -2,14 +2,14 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2023, Arnaud Roques
+ * (C) Copyright 2009-2024, Arnaud Roques
  *
- * Project Info:  http://plantuml.com
+ * Project Info:  https://plantuml.com
  * 
  * If you like this project or if you find it useful, you can support us at:
  * 
- * http://plantuml.com/patreon (only 1$ per month!)
- * http://plantuml.com/paypal
+ * https://plantuml.com/patreon (only 1$ per month!)
+ * https://plantuml.com/paypal
  * 
  * This file is part of PlantUML.
  *
@@ -35,18 +35,17 @@
  */
 package net.sourceforge.plantuml.activitydiagram3.gtile;
 
-import net.sourceforge.plantuml.Direction;
-import net.sourceforge.plantuml.activitydiagram3.ftile.Arrows;
 import net.sourceforge.plantuml.activitydiagram3.ftile.Hexagon;
 import net.sourceforge.plantuml.activitydiagram3.ftile.MergeStrategy;
 import net.sourceforge.plantuml.activitydiagram3.ftile.Snake;
-import net.sourceforge.plantuml.awt.geom.XDimension2D;
-import net.sourceforge.plantuml.awt.geom.XPoint2D;
-import net.sourceforge.plantuml.graphic.HorizontalAlignment;
-import net.sourceforge.plantuml.graphic.TextBlock;
-import net.sourceforge.plantuml.ugraphic.UGraphic;
-import net.sourceforge.plantuml.ugraphic.UPolygon;
-import net.sourceforge.plantuml.ugraphic.UTranslate;
+import net.sourceforge.plantuml.klimt.UTranslate;
+import net.sourceforge.plantuml.klimt.drawing.UGraphic;
+import net.sourceforge.plantuml.klimt.geom.HorizontalAlignment;
+import net.sourceforge.plantuml.klimt.geom.XDimension2D;
+import net.sourceforge.plantuml.klimt.geom.XPoint2D;
+import net.sourceforge.plantuml.klimt.shape.TextBlock;
+import net.sourceforge.plantuml.klimt.shape.UPolygon;
+import net.sourceforge.plantuml.utils.Direction;
 
 public class GConnectionHorizontalThenVerticalDown extends GAbstractConnection {
 
@@ -82,14 +81,15 @@ public class GConnectionHorizontalThenVerticalDown extends GAbstractConnection {
 			// final Dimension2D dimDiamond1 =
 			// diamond1.calculateDimension(ug.getStringBounder());
 			final XDimension2D dimDiamond1 = new XDimension2D(0, 0);
-			final Snake small = Snake.create(skinParam(), getInLinkRenderingColor()).withLabel(textBlock, HorizontalAlignment.LEFT);
+			final Snake small = Snake.create(skinParam(), getInLinkRenderingColor()).withLabel(textBlock,
+					HorizontalAlignment.LEFT);
 			small.addPoint(p1);
 			small.addPoint(p1.getX() + delta, p1.getY());
 			small.addPoint(p1.getX() + delta, p1.getY() + dimDiamond1.getHeight() * .75);
 			ug.draw(small);
 			p1 = small.getLast();
 		}
-		UPolygon usingArrow = /* branch.isEmpty() ? null : */ Arrows.asToDown();
+		UPolygon usingArrow = /* branch.isEmpty() ? null : */ skinParam().arrows().asToDown();
 
 		final Snake snake = Snake.create(skinParam(), getInLinkRenderingColor(), usingArrow)
 				.withLabel(textBlock, HorizontalAlignment.LEFT).withMerge(MergeStrategy.LIMITED);
@@ -102,8 +102,8 @@ public class GConnectionHorizontalThenVerticalDown extends GAbstractConnection {
 
 	@Override
 	public void drawU(UGraphic ug) {
-		final Snake snake = Snake.create(skinParam(), getInLinkRenderingColor(), Arrows.asToDown()).withLabel(textBlock,
-				HorizontalAlignment.LEFT);
+		final Snake snake = Snake.create(skinParam(), getInLinkRenderingColor(), skinParam().arrows().asToDown())
+				.withLabel(textBlock, HorizontalAlignment.LEFT);
 		final XPoint2D p1 = pos1.getTranslated(gpoint1.getPoint2D());
 		final XPoint2D p2 = pos2.getTranslated(gpoint2.getPoint2D());
 		snake.addPoint(p1);

@@ -2,14 +2,14 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2023, Arnaud Roques
+ * (C) Copyright 2009-2024, Arnaud Roques
  *
- * Project Info:  http://plantuml.com
+ * Project Info:  https://plantuml.com
  * 
  * If you like this project or if you find it useful, you can support us at:
  * 
- * http://plantuml.com/patreon (only 1$ per month!)
- * http://plantuml.com/paypal
+ * https://plantuml.com/patreon (only 1$ per month!)
+ * https://plantuml.com/paypal
  * 
  * This file is part of PlantUML.
  *
@@ -39,42 +39,36 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.util.Properties;
 
-import net.sourceforge.plantuml.BackSlash;
-import net.sourceforge.plantuml.Log;
 import net.sourceforge.plantuml.StringUtils;
-import net.sourceforge.plantuml.api.ThemeStyle;
 import net.sourceforge.plantuml.command.PSystemBasicFactory;
-import net.sourceforge.plantuml.command.regex.Matcher2;
-import net.sourceforge.plantuml.command.regex.MyPattern;
-import net.sourceforge.plantuml.command.regex.Pattern2;
 import net.sourceforge.plantuml.core.DiagramType;
 import net.sourceforge.plantuml.core.UmlSource;
 import net.sourceforge.plantuml.log.Logme;
+import net.sourceforge.plantuml.regex.Matcher2;
+import net.sourceforge.plantuml.regex.MyPattern;
+import net.sourceforge.plantuml.regex.Pattern2;
+import net.sourceforge.plantuml.text.BackSlash;
+import net.sourceforge.plantuml.utils.Log;
 
 public class PSystemJcckitFactory extends PSystemBasicFactory<PSystemJcckit> {
+    // ::remove folder when __HAXE__
 
 	private StringBuilder data;
 	private int width;
 	private int height;
 
-	public PSystemJcckitFactory(DiagramType diagramType) {
-		super(diagramType);
+	public PSystemJcckitFactory() {
+		super(DiagramType.JCCKIT);
 	}
 
 	@Override
-	public PSystemJcckit initDiagram(ThemeStyle style, UmlSource source, String startLine) {
+	public PSystemJcckit initDiagram(UmlSource source, String startLine) {
 		this.data = null;
 		this.width = 640;
 		this.height = 400;
-		if (getDiagramType() == DiagramType.UML) {
-			return null;
-		} else if (getDiagramType() == DiagramType.JCCKIT) {
-			extractDimension(startLine);
-			data = new StringBuilder();
-			return createSystem(source);
-		} else {
-			throw new IllegalStateException(getDiagramType().name());
-		}
+		extractDimension(startLine);
+		data = new StringBuilder();
+		return createSystem(source);
 
 	}
 
@@ -109,7 +103,7 @@ public class PSystemJcckitFactory extends PSystemBasicFactory<PSystemJcckit> {
 	}
 
 	@Override
-	public PSystemJcckit executeLine(ThemeStyle style, UmlSource source, PSystemJcckit system, String line) {
+	public PSystemJcckit executeLine(UmlSource source, PSystemJcckit system, String line) {
 		if (system == null && line.startsWith("jcckit")) {
 			data = new StringBuilder();
 			extractDimension(line);

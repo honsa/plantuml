@@ -2,14 +2,14 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2023, Arnaud Roques
+ * (C) Copyright 2009-2024, Arnaud Roques
  *
- * Project Info:  http://plantuml.com
+ * Project Info:  https://plantuml.com
  * 
  * If you like this project or if you find it useful, you can support us at:
  * 
- * http://plantuml.com/patreon (only 1$ per month!)
- * http://plantuml.com/paypal
+ * https://plantuml.com/patreon (only 1$ per month!)
+ * https://plantuml.com/paypal
  * 
  * This file is part of PlantUML.
  *
@@ -35,30 +35,36 @@
  */
 package net.sourceforge.plantuml.wbs;
 
-import net.sourceforge.plantuml.ISkinParam;
 import net.sourceforge.plantuml.activitydiagram3.ftile.vertical.FtileBoxOld;
-import net.sourceforge.plantuml.awt.geom.XDimension2D;
-import net.sourceforge.plantuml.awt.geom.XPoint2D;
-import net.sourceforge.plantuml.creole.CreoleMode;
-import net.sourceforge.plantuml.cucadiagram.Display;
-import net.sourceforge.plantuml.graphic.AbstractTextBlock;
-import net.sourceforge.plantuml.graphic.StringBounder;
-import net.sourceforge.plantuml.graphic.TextBlock;
-import net.sourceforge.plantuml.graphic.TextBlockUtils;
+import net.sourceforge.plantuml.klimt.UTranslate;
+import net.sourceforge.plantuml.klimt.creole.CreoleMode;
+import net.sourceforge.plantuml.klimt.creole.Display;
+import net.sourceforge.plantuml.klimt.drawing.AbstractCommonUGraphic;
+import net.sourceforge.plantuml.klimt.drawing.UGraphic;
+import net.sourceforge.plantuml.klimt.font.StringBounder;
+import net.sourceforge.plantuml.klimt.geom.XDimension2D;
+import net.sourceforge.plantuml.klimt.geom.XPoint2D;
+import net.sourceforge.plantuml.klimt.shape.AbstractTextBlock;
+import net.sourceforge.plantuml.klimt.shape.TextBlock;
+import net.sourceforge.plantuml.klimt.shape.TextBlockUtils;
 import net.sourceforge.plantuml.mindmap.IdeaShape;
+import net.sourceforge.plantuml.style.ISkinParam;
 import net.sourceforge.plantuml.style.Style;
-import net.sourceforge.plantuml.ugraphic.UGraphic;
 
 class ITFLeaf extends AbstractTextBlock implements ITF {
 
 	private final TextBlock box;
+	private final WElement idea;
 
-	public ITFLeaf(Style style, ISkinParam skinParam, Display label, IdeaShape shape) {
+	public ITFLeaf(WElement idea, ISkinParam skinParam) {
+		final IdeaShape shape = idea.getShape();
+		final Style style = idea.getStyle();
+		final Display label = idea.getLabel();
+		this.idea = idea;
 		if (shape == IdeaShape.BOX) {
 			this.box = FtileBoxOld.createWbs(style, skinParam, label);
 		} else {
-			final TextBlock text = label.create0(
-					style.getFontConfiguration(skinParam.getThemeStyle(), skinParam.getIHtmlColorSet()),
+			final TextBlock text = label.create0(style.getFontConfiguration(skinParam.getIHtmlColorSet()),
 					style.getHorizontalAlignment(), skinParam, style.wrapWidth(), CreoleMode.FULL, null, null);
 			this.box = TextBlockUtils.withMargin(text, 0, 3, 1, 1);
 		}
@@ -69,6 +75,10 @@ class ITFLeaf extends AbstractTextBlock implements ITF {
 	}
 
 	public void drawU(UGraphic ug) {
+		if (ug instanceof AbstractCommonUGraphic) {
+			final UTranslate translate = ((AbstractCommonUGraphic) ug).getTranslate();
+			idea.setGeometry(translate, calculateDimension(ug.getStringBounder()));
+		}
 		box.drawU(ug);
 	}
 

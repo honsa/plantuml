@@ -2,14 +2,14 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2023, Arnaud Roques
+ * (C) Copyright 2009-2024, Arnaud Roques
  *
- * Project Info:  http://plantuml.com
+ * Project Info:  https://plantuml.com
  * 
  * If you like this project or if you find it useful, you can support us at:
  * 
- * http://plantuml.com/patreon (only 1$ per month!)
- * http://plantuml.com/paypal
+ * https://plantuml.com/patreon (only 1$ per month!)
+ * https://plantuml.com/paypal
  * 
  * This file is part of PlantUML.
  *
@@ -35,19 +35,18 @@
  */
 package net.sourceforge.plantuml.oregon;
 
-import net.sourceforge.plantuml.api.ThemeStyle;
 import net.sourceforge.plantuml.command.PSystemBasicFactory;
 import net.sourceforge.plantuml.core.UmlSource;
 
 public class PSystemOregonFactory extends PSystemBasicFactory<PSystemOregon> {
 
 	@Override
-	public PSystemOregon initDiagram(ThemeStyle style, UmlSource source, String startLine) {
+	public PSystemOregon initDiagram(UmlSource source, String startLine) {
 		return null;
 	}
 
 	@Override
-	public PSystemOregon executeLine(ThemeStyle style, UmlSource source, PSystemOregon system, String line) {
+	public PSystemOregon executeLine(UmlSource source, PSystemOregon system, String line) {
 		if (system == null && line.equalsIgnoreCase("run oregon trail"))
 			return new PSystemOregon(source);
 

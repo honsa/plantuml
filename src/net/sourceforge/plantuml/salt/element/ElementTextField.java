@@ -2,14 +2,14 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2023, Arnaud Roques
+ * (C) Copyright 2009-2024, Arnaud Roques
  *
- * Project Info:  http://plantuml.com
+ * Project Info:  https://plantuml.com
  * 
  * If you like this project or if you find it useful, you can support us at:
  * 
- * http://plantuml.com/patreon (only 1$ per month!)
- * http://plantuml.com/paypal
+ * https://plantuml.com/patreon (only 1$ per month!)
+ * https://plantuml.com/paypal
  * 
  * This file is part of PlantUML.
  *
@@ -35,13 +35,13 @@
  */
 package net.sourceforge.plantuml.salt.element;
 
-import net.sourceforge.plantuml.ISkinSimple;
-import net.sourceforge.plantuml.awt.geom.XDimension2D;
-import net.sourceforge.plantuml.graphic.StringBounder;
-import net.sourceforge.plantuml.ugraphic.UFont;
-import net.sourceforge.plantuml.ugraphic.UGraphic;
-import net.sourceforge.plantuml.ugraphic.ULine;
-import net.sourceforge.plantuml.ugraphic.UTranslate;
+import net.sourceforge.plantuml.klimt.UTranslate;
+import net.sourceforge.plantuml.klimt.drawing.UGraphic;
+import net.sourceforge.plantuml.klimt.font.StringBounder;
+import net.sourceforge.plantuml.klimt.font.UFont;
+import net.sourceforge.plantuml.klimt.geom.XDimension2D;
+import net.sourceforge.plantuml.klimt.shape.ULine;
+import net.sourceforge.plantuml.style.ISkinSimple;
 
 public class ElementTextField extends AbstractElementText implements Element {
 
@@ -51,7 +51,7 @@ public class ElementTextField extends AbstractElementText implements Element {
 
 	public XDimension2D getPreferredDimension(StringBounder stringBounder, double x, double y) {
 		final XDimension2D dim = getTextDimensionAt(stringBounder, x);
-		return XDimension2D.delta(dim, 6, 2);
+		return dim.delta(6, 2);
 	}
 
 	public void drawU(UGraphic ug, int zIndex, XDimension2D dimToUse) {

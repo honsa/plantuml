@@ -2,14 +2,14 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2023, Arnaud Roques
+ * (C) Copyright 2009-2024, Arnaud Roques
  *
- * Project Info:  http://plantuml.com
+ * Project Info:  https://plantuml.com
  * 
  * If you like this project or if you find it useful, you can support us at:
  * 
- * http://plantuml.com/patreon (only 1$ per month!)
- * http://plantuml.com/paypal
+ * https://plantuml.com/patreon (only 1$ per month!)
+ * https://plantuml.com/paypal
  * 
  * This file is part of PlantUML.
  *
@@ -75,9 +75,9 @@ public class RBlocks {
 
 	public RBlocks change(BigInteger E, BigInteger N) {
 		final RBlocks result = new RBlocks();
-		for (RBlock rsa : all) {
+		for (RBlock rsa : all)
 			result.all.add(rsa.change(E, N));
-		}
+
 		return result;
 	}
 

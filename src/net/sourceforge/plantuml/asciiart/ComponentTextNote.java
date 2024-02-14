@@ -2,14 +2,14 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2023, Arnaud Roques
+ * (C) Copyright 2009-2024, Arnaud Roques
  *
- * Project Info:  http://plantuml.com
+ * Project Info:  https://plantuml.com
  * 
  * If you like this project or if you find it useful, you can support us at:
  * 
- * http://plantuml.com/patreon (only 1$ per month!)
- * http://plantuml.com/paypal
+ * https://plantuml.com/patreon (only 1$ per month!)
+ * https://plantuml.com/paypal
  * 
  * This file is part of PlantUML.
  *
@@ -37,14 +37,14 @@ package net.sourceforge.plantuml.asciiart;
 
 import net.sourceforge.plantuml.FileFormat;
 import net.sourceforge.plantuml.StringUtils;
-import net.sourceforge.plantuml.awt.geom.XDimension2D;
-import net.sourceforge.plantuml.cucadiagram.Display;
-import net.sourceforge.plantuml.graphic.StringBounder;
+import net.sourceforge.plantuml.klimt.creole.Display;
+import net.sourceforge.plantuml.klimt.drawing.UGraphic;
+import net.sourceforge.plantuml.klimt.drawing.txt.UGraphicTxt;
+import net.sourceforge.plantuml.klimt.font.StringBounder;
+import net.sourceforge.plantuml.klimt.geom.XDimension2D;
 import net.sourceforge.plantuml.skin.Area;
 import net.sourceforge.plantuml.skin.ComponentType;
 import net.sourceforge.plantuml.skin.Context2D;
-import net.sourceforge.plantuml.ugraphic.UGraphic;
-import net.sourceforge.plantuml.ugraphic.txt.UGraphicTxt;
 
 public class ComponentTextNote extends AbstractComponentText {
 
@@ -65,23 +65,22 @@ public class ComponentTextNote extends AbstractComponentText {
 		final int height = (int) dimensionToUse.getHeight();
 		charArea.fillRect(' ', 2, 1, width - 3, height - 2);
 		if (type == ComponentType.NOTE) {
-			if (fileFormat == FileFormat.UTXT) {
+			if (fileFormat == FileFormat.UTXT)
 				charArea.drawNoteSimpleUnicode(2, 0, width - 2, height);
-			} else {
+			else
 				charArea.drawNoteSimple(2, 0, width - 2, height);
-			}
-		} else if (type == ComponentType.NOTE_BOX) {
-			if (fileFormat == FileFormat.UTXT) {
+		} else if (type == ComponentType.NOTE_BOX || type == ComponentType.NOTE_HEXAGONAL) {
+			if (fileFormat == FileFormat.UTXT)
 				charArea.drawBoxSimpleUnicode(2, 0, width - 2, height);
-			} else {
+			else
 				charArea.drawBoxSimple(2, 0, width - 2, height);
-			}
 		}
-		if (fileFormat == FileFormat.UTXT) {
+
+		if (fileFormat == FileFormat.UTXT)
 			charArea.drawStringsLRUnicode(stringsToDisplay.asList(), 3, 1);
-		} else {
+		else
 			charArea.drawStringsLRSimple(stringsToDisplay.asList(), 3, 1);
-		}
+
 	}
 
 	public double getPreferredHeight(StringBounder stringBounder) {

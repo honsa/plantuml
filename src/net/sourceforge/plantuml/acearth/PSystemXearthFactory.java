@@ -2,14 +2,14 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2023, Arnaud Roques
+ * (C) Copyright 2009-2024, Arnaud Roques
  *
- * Project Info:  http://plantuml.com
+ * Project Info:  https://plantuml.com
  *
  * If you like this project or if you find it useful, you can support us at:
  *
- * http://plantuml.com/patreon (only 1$ per month!)
- * http://plantuml.com/paypal
+ * https://plantuml.com/patreon (only 1$ per month!)
+ * https://plantuml.com/paypal
  *
  * This file is part of PlantUML.
  *
@@ -40,16 +40,16 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import ext.plantuml.com.ctreber.acearth.plugins.markers.Marker;
-import net.sourceforge.plantuml.api.ThemeStyle;
+import zext.plantuml.com.ctreber.acearth.plugins.markers.Marker;
 import net.sourceforge.plantuml.command.PSystemBasicFactory;
-import net.sourceforge.plantuml.command.regex.Matcher2;
-import net.sourceforge.plantuml.command.regex.MyPattern;
-import net.sourceforge.plantuml.command.regex.Pattern2;
 import net.sourceforge.plantuml.core.UmlSource;
 import net.sourceforge.plantuml.log.Logme;
+import net.sourceforge.plantuml.regex.Matcher2;
+import net.sourceforge.plantuml.regex.MyPattern;
+import net.sourceforge.plantuml.regex.Pattern2;
 
 public class PSystemXearthFactory extends PSystemBasicFactory<PSystemXearth> {
+    // ::remove folder when __HAXE__
 
 	private final Map<String, String> config = new LinkedHashMap<>();
 	private final List<Marker> markers = new ArrayList<>();
@@ -57,7 +57,7 @@ public class PSystemXearthFactory extends PSystemBasicFactory<PSystemXearth> {
 	private int height;
 
 	@Override
-	public PSystemXearth initDiagram(ThemeStyle style, UmlSource source, String startLine) {
+	public PSystemXearth initDiagram(UmlSource source, String startLine) {
 		this.width = 512;
 		this.height = 512;
 		this.config.clear();
@@ -76,7 +76,7 @@ public class PSystemXearthFactory extends PSystemBasicFactory<PSystemXearth> {
 	}
 
 	@Override
-	public PSystemXearth executeLine(ThemeStyle style, UmlSource source, PSystemXearth system, String line) {
+	public PSystemXearth executeLine(UmlSource source, PSystemXearth system, String line) {
 		if (system == null && line.startsWith("xearth")) {
 			extractDimension(line);
 			system = new PSystemXearth(source, width, height, config, markers);

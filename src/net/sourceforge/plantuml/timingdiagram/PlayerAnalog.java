@@ -2,14 +2,14 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2023, Arnaud Roques
+ * (C) Copyright 2009-2024, Arnaud Roques
  *
- * Project Info:  http://plantuml.com
+ * Project Info:  https://plantuml.com
  * 
  * If you like this project or if you find it useful, you can support us at:
  * 
- * http://plantuml.com/patreon (only 1$ per month!)
- * http://plantuml.com/paypal
+ * https://plantuml.com/patreon (only 1$ per month!)
+ * https://plantuml.com/paypal
  * 
  * This file is part of PlantUML.
  *
@@ -41,26 +41,27 @@ import java.util.Map.Entry;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
-import net.sourceforge.plantuml.ISkinParam;
-import net.sourceforge.plantuml.awt.geom.XDimension2D;
-import net.sourceforge.plantuml.awt.geom.XPoint2D;
-import net.sourceforge.plantuml.command.Position;
-import net.sourceforge.plantuml.cucadiagram.Display;
-import net.sourceforge.plantuml.cucadiagram.Stereotype;
-import net.sourceforge.plantuml.graphic.AbstractTextBlock;
-import net.sourceforge.plantuml.graphic.HorizontalAlignment;
-import net.sourceforge.plantuml.graphic.StringBounder;
-import net.sourceforge.plantuml.graphic.TextBlock;
-import net.sourceforge.plantuml.graphic.UDrawable;
-import net.sourceforge.plantuml.graphic.color.Colors;
+import net.sourceforge.plantuml.klimt.UTranslate;
+import net.sourceforge.plantuml.klimt.color.Colors;
+import net.sourceforge.plantuml.klimt.creole.Display;
+import net.sourceforge.plantuml.klimt.drawing.UGraphic;
+import net.sourceforge.plantuml.klimt.font.StringBounder;
+import net.sourceforge.plantuml.klimt.geom.HorizontalAlignment;
+import net.sourceforge.plantuml.klimt.geom.XDimension2D;
+import net.sourceforge.plantuml.klimt.geom.XPoint2D;
+import net.sourceforge.plantuml.klimt.shape.AbstractTextBlock;
+import net.sourceforge.plantuml.klimt.shape.TextBlock;
+import net.sourceforge.plantuml.klimt.shape.UDrawable;
+import net.sourceforge.plantuml.klimt.shape.ULine;
 import net.sourceforge.plantuml.log.Logme;
+import net.sourceforge.plantuml.skin.ArrowConfiguration;
+import net.sourceforge.plantuml.stereo.Stereotype;
+import net.sourceforge.plantuml.style.ISkinParam;
 import net.sourceforge.plantuml.style.SName;
 import net.sourceforge.plantuml.style.StyleSignature;
 import net.sourceforge.plantuml.style.StyleSignatureBasic;
 import net.sourceforge.plantuml.timingdiagram.graphic.IntricatedPoint;
-import net.sourceforge.plantuml.ugraphic.UGraphic;
-import net.sourceforge.plantuml.ugraphic.ULine;
-import net.sourceforge.plantuml.ugraphic.UTranslate;
+import net.sourceforge.plantuml.utils.Position;
 
 public class PlayerAnalog extends Player {
 
@@ -83,7 +84,11 @@ public class PlayerAnalog extends Player {
 		if (start != null)
 			return start;
 
-		return 0;
+		double min = 0;
+		for (Double val : values.values())
+			min = Math.min(min, val);
+
+		return min;
 	}
 
 	private double getMax() {
@@ -100,10 +105,12 @@ public class PlayerAnalog extends Player {
 		return max;
 	}
 
+	@Override
 	public double getFullHeight(StringBounder stringBounder) {
 		return getHeightForConstraints(stringBounder) + suggestedHeight;
 	}
 
+	@Override
 	public IntricatedPoint getTimeProjection(StringBounder stringBounder, TimeTick tick) {
 		final double x = ruler.getPosInPixel(tick);
 		final double value = getValueAt(stringBounder, tick);
@@ -134,14 +141,17 @@ public class PlayerAnalog extends Player {
 		return last.getValue();
 	}
 
+	@Override
 	public void addNote(TimeTick now, Display note, Position position) {
 		throw new UnsupportedOperationException();
 	}
 
+	@Override
 	public void defineState(String stateCode, String label) {
 		throw new UnsupportedOperationException();
 	}
 
+	@Override
 	public void setState(TimeTick now, String comment, Colors color, String... valueString) {
 		final double value = getState(valueString[0]);
 		if (now == null)
@@ -164,8 +174,8 @@ public class PlayerAnalog extends Player {
 	}
 
 	@Override
-	public void createConstraint(TimeTick tick1, TimeTick tick2, String message) {
-		this.constraints.add(new TimeConstraint(tick1, tick2, message, skinParam));
+	public void createConstraint(TimeTick tick1, TimeTick tick2, String message, ArrowConfiguration config) {
+		this.constraints.add(new TimeConstraint(1, tick1, tick2, message, skinParam, config));
 	}
 
 	private double getYpos(StringBounder stringBounder, double value) {
@@ -182,7 +192,7 @@ public class PlayerAnalog extends Player {
 
 			public XDimension2D calculateDimension(StringBounder stringBounder) {
 				final XDimension2D dim = getTitle().calculateDimension(stringBounder);
-				return XDimension2D.delta(dim, 5 + getMaxWidthForTicks(stringBounder), 0);
+				return dim.delta(5 + getMaxWidthForTicks(stringBounder), 0);
 			}
 		};
 	}
@@ -251,6 +261,7 @@ public class PlayerAnalog extends Player {
 
 	}
 
+	@Override
 	public UDrawable getPart2() {
 		return new UDrawable() {
 			public void drawU(UGraphic ug) {

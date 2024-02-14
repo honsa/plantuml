@@ -2,14 +2,14 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2023, Arnaud Roques
+ * (C) Copyright 2009-2024, Arnaud Roques
  *
- * Project Info:  http://plantuml.com
+ * Project Info:  https://plantuml.com
  * 
  * If you like this project or if you find it useful, you can support us at:
  * 
- * http://plantuml.com/patreon (only 1$ per month!)
- * http://plantuml.com/paypal
+ * https://plantuml.com/patreon (only 1$ per month!)
+ * https://plantuml.com/paypal
  * 
  * This file is part of PlantUML.
  *
@@ -38,10 +38,8 @@ package net.sourceforge.plantuml.activitydiagram3.ftile.vcompact;
 import java.util.ArrayList;
 import java.util.List;
 
-import net.sourceforge.plantuml.ISkinParam;
 import net.sourceforge.plantuml.activitydiagram3.LinkRendering;
 import net.sourceforge.plantuml.activitydiagram3.ftile.AbstractConnection;
-import net.sourceforge.plantuml.activitydiagram3.ftile.Arrows;
 import net.sourceforge.plantuml.activitydiagram3.ftile.Connection;
 import net.sourceforge.plantuml.activitydiagram3.ftile.ConnectionTranslatable;
 import net.sourceforge.plantuml.activitydiagram3.ftile.Ftile;
@@ -51,16 +49,17 @@ import net.sourceforge.plantuml.activitydiagram3.ftile.FtileKilled;
 import net.sourceforge.plantuml.activitydiagram3.ftile.FtileUtils;
 import net.sourceforge.plantuml.activitydiagram3.ftile.Snake;
 import net.sourceforge.plantuml.activitydiagram3.ftile.vertical.FtileThinSplit;
-import net.sourceforge.plantuml.awt.geom.XPoint2D;
-import net.sourceforge.plantuml.cucadiagram.Display;
-import net.sourceforge.plantuml.graphic.Rainbow;
-import net.sourceforge.plantuml.graphic.StringBounder;
+import net.sourceforge.plantuml.decoration.Rainbow;
+import net.sourceforge.plantuml.klimt.UTranslate;
+import net.sourceforge.plantuml.klimt.color.HColor;
+import net.sourceforge.plantuml.klimt.creole.Display;
+import net.sourceforge.plantuml.klimt.drawing.UGraphic;
+import net.sourceforge.plantuml.klimt.font.StringBounder;
+import net.sourceforge.plantuml.klimt.geom.XPoint2D;
+import net.sourceforge.plantuml.style.ISkinParam;
 import net.sourceforge.plantuml.style.SName;
 import net.sourceforge.plantuml.style.Style;
 import net.sourceforge.plantuml.style.StyleSignatureBasic;
-import net.sourceforge.plantuml.ugraphic.UGraphic;
-import net.sourceforge.plantuml.ugraphic.UTranslate;
-import net.sourceforge.plantuml.ugraphic.color.HColor;
 
 public class ParallelBuilderSplit extends AbstractParallelFtilesBuilder {
 
@@ -78,7 +77,7 @@ public class ParallelBuilderSplit extends AbstractParallelFtilesBuilder {
 		Ftile result = inner;
 		final List<Connection> conns = new ArrayList<>();
 		final Style style = getStyleSignature().getMergedStyle(skinParam().getCurrentStyleBuilder());
-		final Rainbow thinColor = Rainbow.build(style, skinParam().getIHtmlColorSet(), skinParam().getThemeStyle());
+		final Rainbow thinColor = Rainbow.build(style, skinParam().getIHtmlColorSet());
 
 		final Ftile thin = new FtileThinSplit(skinParam(), getThin1Color(thinColor), list99.get(0).getSwimlaneIn());
 		double x = 0;
@@ -92,8 +91,7 @@ public class ParallelBuilderSplit extends AbstractParallelFtilesBuilder {
 			last = x + dim.getLeft();
 
 			final LinkRendering inLinkRendering = tmp.getInLinkRendering();
-			final Rainbow rainbow = inLinkRendering
-					.getRainbow(Rainbow.build(style, skinParam().getIHtmlColorSet(), skinParam().getThemeStyle()));
+			final Rainbow rainbow = inLinkRendering.getRainbow(Rainbow.build(style, skinParam().getIHtmlColorSet()));
 
 			conns.add(new ConnectionIn(thin, tmp, x, rainbow));
 			x += dim.getWidth();
@@ -116,8 +114,7 @@ public class ParallelBuilderSplit extends AbstractParallelFtilesBuilder {
 		final Style style = getStyleSignature().getMergedStyle(skinParam().getCurrentStyleBuilder());
 		for (Ftile tmp : list99) {
 			final LinkRendering inLinkRendering = tmp.getInLinkRendering();
-			final Rainbow rainbow = inLinkRendering
-					.getRainbow(Rainbow.build(style, skinParam().getIHtmlColorSet(), skinParam().getThemeStyle()));
+			final Rainbow rainbow = inLinkRendering.getRainbow(Rainbow.build(style, skinParam().getIHtmlColorSet()));
 
 			if (rainbow.isInvisible() == false)
 				return thinColor.getColor();
@@ -143,8 +140,7 @@ public class ParallelBuilderSplit extends AbstractParallelFtilesBuilder {
 
 		final Style style = getStyleSignature().getMergedStyle(skinParam().getCurrentStyleBuilder());
 		final LinkRendering inLinkRendering = result.getInLinkRendering();
-		final Rainbow thinColor = inLinkRendering
-				.getRainbow(Rainbow.build(style, skinParam().getIHtmlColorSet(), skinParam().getThemeStyle()));
+		final Rainbow thinColor = inLinkRendering.getRainbow(Rainbow.build(style, skinParam().getIHtmlColorSet()));
 
 		final Ftile out = new FtileThinSplit(skinParam(), thinColor.getColor(), swimlaneOutForStep2());
 		result = new FtileAssemblySimple(result, out);
@@ -163,8 +159,7 @@ public class ParallelBuilderSplit extends AbstractParallelFtilesBuilder {
 			}
 
 			final LinkRendering outLinkRendering = tmp.getOutLinkRendering();
-			final Rainbow rainbow = outLinkRendering
-					.getRainbow(Rainbow.build(style, skinParam().getIHtmlColorSet(), skinParam().getThemeStyle()));
+			final Rainbow rainbow = outLinkRendering.getRainbow(Rainbow.build(style, skinParam().getIHtmlColorSet()));
 
 			if (tmp.calculateDimension(getStringBounder()).hasPointOut())
 				conns.add(new ConnectionOut(translate0, tmp, out, x, rainbow, getHeightOfMiddle(inner)));
@@ -198,7 +193,7 @@ public class ParallelBuilderSplit extends AbstractParallelFtilesBuilder {
 		public void drawU(UGraphic ug) {
 			ug = ug.apply(UTranslate.dx(x));
 			final FtileGeometry geo = getFtile2().calculateDimension(getStringBounder());
-			Snake snake = Snake.create(skinParam(), arrowColor, Arrows.asToDown());
+			Snake snake = Snake.create(skinParam(), arrowColor, skinParam().arrows().asToDown());
 			if (Display.isNull(label) == false)
 				snake = snake.withLabel(getTextBlock(label), arrowHorizontalAlignment());
 
@@ -214,7 +209,7 @@ public class ParallelBuilderSplit extends AbstractParallelFtilesBuilder {
 			final XPoint2D p1 = new XPoint2D(geo.getLeft(), 0);
 			final XPoint2D p2 = new XPoint2D(geo.getLeft(), geo.getInY());
 
-			Snake snake = Snake.create(skinParam(), arrowColor, Arrows.asToDown());
+			Snake snake = Snake.create(skinParam(), arrowColor, skinParam().arrows().asToDown());
 			if (Display.isNull(label) == false)
 				snake = snake.withLabel(getTextBlock(label), arrowHorizontalAlignment());
 
@@ -253,7 +248,7 @@ public class ParallelBuilderSplit extends AbstractParallelFtilesBuilder {
 			if (geo.hasPointOut() == false)
 				return;
 
-			Snake snake = Snake.create(skinParam(), arrowColor, Arrows.asToDown());
+			Snake snake = Snake.create(skinParam(), arrowColor, skinParam().arrows().asToDown());
 			if (Display.isNull(label) == false)
 				snake = snake.withLabel(getTextBlock(label), arrowHorizontalAlignment());
 
@@ -274,7 +269,7 @@ public class ParallelBuilderSplit extends AbstractParallelFtilesBuilder {
 			final XPoint2D p1 = translate0.getTranslated(new XPoint2D(geo.getLeft(), geo.getOutY()));
 			final XPoint2D p2 = translate0.getTranslated(new XPoint2D(geo.getLeft(), height));
 
-			Snake snake = Snake.create(skinParam(), arrowColor, Arrows.asToDown());
+			Snake snake = Snake.create(skinParam(), arrowColor, skinParam().arrows().asToDown());
 			if (Display.isNull(label) == false)
 				snake = snake.withLabel(getTextBlock(label), arrowHorizontalAlignment());
 

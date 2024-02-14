@@ -2,14 +2,14 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2023, Arnaud Roques
+ * (C) Copyright 2009-2024, Arnaud Roques
  *
- * Project Info:  http://plantuml.com
+ * Project Info:  https://plantuml.com
  * 
  * If you like this project or if you find it useful, you can support us at:
  * 
- * http://plantuml.com/patreon (only 1$ per month!)
- * http://plantuml.com/paypal
+ * https://plantuml.com/patreon (only 1$ per month!)
+ * https://plantuml.com/paypal
  * 
  * This file is part of PlantUML.
  *
@@ -35,17 +35,16 @@
  */
 package net.sourceforge.plantuml.activitydiagram3.gtile;
 
-import net.sourceforge.plantuml.Direction;
-import net.sourceforge.plantuml.activitydiagram3.ftile.Arrows;
 import net.sourceforge.plantuml.activitydiagram3.ftile.Hexagon;
 import net.sourceforge.plantuml.activitydiagram3.ftile.MergeStrategy;
 import net.sourceforge.plantuml.activitydiagram3.ftile.Snake;
-import net.sourceforge.plantuml.awt.geom.XPoint2D;
-import net.sourceforge.plantuml.graphic.HorizontalAlignment;
-import net.sourceforge.plantuml.graphic.TextBlock;
-import net.sourceforge.plantuml.ugraphic.UGraphic;
-import net.sourceforge.plantuml.ugraphic.UPolygon;
-import net.sourceforge.plantuml.ugraphic.UTranslate;
+import net.sourceforge.plantuml.klimt.UTranslate;
+import net.sourceforge.plantuml.klimt.drawing.UGraphic;
+import net.sourceforge.plantuml.klimt.geom.HorizontalAlignment;
+import net.sourceforge.plantuml.klimt.geom.XPoint2D;
+import net.sourceforge.plantuml.klimt.shape.TextBlock;
+import net.sourceforge.plantuml.klimt.shape.UPolygon;
+import net.sourceforge.plantuml.utils.Direction;
 
 public class GConnectionVerticalDownThenHorizontal extends GAbstractConnection {
 
@@ -77,7 +76,7 @@ public class GConnectionVerticalDownThenHorizontal extends GAbstractConnection {
 		final XPoint2D mp1a = translate1.getTranslated(p1);
 		final XPoint2D mp2b = translate2.getTranslated(p2);
 		final Direction newDirection = Direction.leftOrRight(mp1a, mp2b);
-		final UPolygon arrow = x2 > x1 ? Arrows.asToRight() : Arrows.asToLeft();
+		final UPolygon arrow = x2 > x1 ? skinParam().arrows().asToRight() : skinParam().arrows().asToLeft();
 		if (originalDirection == newDirection) {
 			final double delta = (x2 > x1 ? -1 : 1) * 1.5 * Hexagon.hexagonHalfSize;
 			final XPoint2D mp2bc = new XPoint2D(mp2b.getX() + delta, mp2b.getY());
@@ -88,7 +87,8 @@ public class GConnectionVerticalDownThenHorizontal extends GAbstractConnection {
 			snake.addPoint(mp2bc.getX(), middle);
 			snake.addPoint(mp2bc);
 			ug.draw(snake);
-			final Snake small = Snake.create(skinParam(), getInLinkRenderingColor(), arrow).withMerge(MergeStrategy.LIMITED);
+			final Snake small = Snake.create(skinParam(), getInLinkRenderingColor(), arrow)
+					.withMerge(MergeStrategy.LIMITED);
 			small.addPoint(mp2bc);
 			small.addPoint(mp2bc.getX(), mp2b.getY());
 			small.addPoint(mp2b);
@@ -101,7 +101,8 @@ public class GConnectionVerticalDownThenHorizontal extends GAbstractConnection {
 			snake.addPoint(mp1a.getX(), mp2bb.getY());
 			snake.addPoint(mp2bb);
 			ug.draw(snake);
-			final Snake small = Snake.create(skinParam(), getInLinkRenderingColor(), arrow).withMerge(MergeStrategy.LIMITED);
+			final Snake small = Snake.create(skinParam(), getInLinkRenderingColor(), arrow)
+					.withMerge(MergeStrategy.LIMITED);
 			small.addPoint(mp2bb);
 			small.addPoint(mp2bb.getX(), mp2b.getY());
 			small.addPoint(mp2b);
@@ -115,7 +116,8 @@ public class GConnectionVerticalDownThenHorizontal extends GAbstractConnection {
 	public void drawU(UGraphic ug) {
 		final XPoint2D p1 = pos1.getTranslated(gpoint1.getPoint2D());
 		final XPoint2D p2 = pos2.getTranslated(gpoint2.getPoint2D());
-		final UPolygon arrow = p1.getX() < p2.getX() ? Arrows.asToRight() : Arrows.asToLeft();
+		final UPolygon arrow = p1.getX() < p2.getX() ? skinParam().arrows().asToRight()
+				: skinParam().arrows().asToLeft();
 		final Snake snake = Snake.create(skinParam(), getInLinkRenderingColor(), arrow).withLabel(textBlock,
 				HorizontalAlignment.LEFT);
 		snake.addPoint(p1);

@@ -2,14 +2,14 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2023, Arnaud Roques
+ * (C) Copyright 2009-2024, Arnaud Roques
  *
- * Project Info:  http://plantuml.com
+ * Project Info:  https://plantuml.com
  * 
  * If you like this project or if you find it useful, you can support us at:
  * 
- * http://plantuml.com/patreon (only 1$ per month!)
- * http://plantuml.com/paypal
+ * https://plantuml.com/patreon (only 1$ per month!)
+ * https://plantuml.com/paypal
  * 
  * This file is part of PlantUML.
  *
@@ -38,26 +38,28 @@ package net.sourceforge.plantuml.svek;
 import java.util.HashSet;
 import java.util.Set;
 
-import net.sourceforge.plantuml.awt.geom.XDimension2D;
-import net.sourceforge.plantuml.cucadiagram.Stereotype;
-import net.sourceforge.plantuml.cucadiagram.dot.DotData;
-import net.sourceforge.plantuml.graphic.AbstractTextBlock;
-import net.sourceforge.plantuml.graphic.StringBounder;
-import net.sourceforge.plantuml.graphic.TextBlockUtils;
+import net.sourceforge.plantuml.decoration.Rainbow;
+import net.sourceforge.plantuml.dot.DotData;
+import net.sourceforge.plantuml.klimt.UTranslate;
+import net.sourceforge.plantuml.klimt.color.HColor;
+import net.sourceforge.plantuml.klimt.color.HColors;
+import net.sourceforge.plantuml.klimt.drawing.UGraphic;
+import net.sourceforge.plantuml.klimt.font.StringBounder;
+import net.sourceforge.plantuml.klimt.geom.MinMax;
+import net.sourceforge.plantuml.klimt.geom.XDimension2D;
+import net.sourceforge.plantuml.klimt.shape.AbstractTextBlock;
+import net.sourceforge.plantuml.klimt.shape.TextBlockUtils;
+import net.sourceforge.plantuml.klimt.shape.UHidden;
+import net.sourceforge.plantuml.stereo.Stereotype;
 import net.sourceforge.plantuml.style.PName;
 import net.sourceforge.plantuml.style.SName;
 import net.sourceforge.plantuml.style.Style;
 import net.sourceforge.plantuml.style.StyleBuilder;
 import net.sourceforge.plantuml.style.StyleSignature;
 import net.sourceforge.plantuml.style.StyleSignatureBasic;
-import net.sourceforge.plantuml.ugraphic.MinMax;
-import net.sourceforge.plantuml.ugraphic.UGraphic;
-import net.sourceforge.plantuml.ugraphic.UHidden;
-import net.sourceforge.plantuml.ugraphic.UTranslate;
-import net.sourceforge.plantuml.ugraphic.color.HColor;
-import net.sourceforge.plantuml.ugraphic.color.HColors;
 
 public final class SvekResult extends AbstractTextBlock implements IEntityImage {
+	// ::remove file when __CORE__
 
 	private final DotData dotData;
 	private final DotStringFactory dotStringFactory;
@@ -70,14 +72,14 @@ public final class SvekResult extends AbstractTextBlock implements IEntityImage 
 	public void drawU(UGraphic ug) {
 
 		for (Cluster cluster : dotStringFactory.getBibliotekon().allCluster())
-			cluster.drawU(ug, dotData.getUmlDiagramType(), dotData.getSkinParam());
+			if (cluster.getGroup().isPacked() == false)
+				cluster.drawU(ug, dotData.getUmlDiagramType());
 
 		final Style style2 = getDefaultStyleDefinition(null)
 				.getMergedStyle(dotData.getSkinParam().getCurrentStyleBuilder());
 
-		HColor color = style2.value(PName.LineColor).asColor(dotData.getSkinParam().getThemeStyle(),
-				dotData.getSkinParam().getIHtmlColorSet());
-		color = HColors.noGradient(color);
+		final HColor borderColor = HColors
+				.noGradient(style2.value(PName.LineColor).asColor(dotData.getSkinParam().getIHtmlColorSet()));
 
 		for (SvekNode node : dotStringFactory.getBibliotekon().allNodes()) {
 			final double minX = node.getMinX();
@@ -86,7 +88,7 @@ public final class SvekResult extends AbstractTextBlock implements IEntityImage 
 			final IEntityImage image = node.getImage();
 			image.drawU(ug2.apply(new UTranslate(minX, minY)));
 			if (image instanceof Untranslated)
-				((Untranslated) image).drawUntranslated(ug.apply(color), minX, minY);
+				((Untranslated) image).drawUntranslated(ug.apply(borderColor), minX, minY);
 
 		}
 
@@ -99,11 +101,10 @@ public final class SvekResult extends AbstractTextBlock implements IEntityImage 
 
 			final StyleBuilder currentStyleBuilder = line.getCurrentStyleBuilder();
 			final Style styleLine = getDefaultStyleDefinition(line.getStereotype()).getMergedStyle(currentStyleBuilder);
-			color = styleLine.value(PName.LineColor).asColor(dotData.getSkinParam().getThemeStyle(),
-					dotData.getSkinParam().getIHtmlColorSet());
-			color = HColors.noGradient(color);
 
-			line.drawU(ug2, styleLine.getStroke(), color, ids);
+			final Rainbow rainbow = Rainbow.build(styleLine, dotData.getSkinParam().getIHtmlColorSet());
+
+			line.drawU(ug2, ids, styleLine.getStroke(), rainbow);
 		}
 
 		for (SvekNode node : dotStringFactory.getBibliotekon().allNodes())
@@ -129,8 +130,7 @@ public final class SvekResult extends AbstractTextBlock implements IEntityImage 
 	public HColor getBackcolor() {
 		final Style style = StyleSignatureBasic.of(SName.root, SName.document)
 				.getMergedStyle(dotData.getSkinParam().getCurrentStyleBuilder());
-		return style.value(PName.BackGroundColor).asColor(dotData.getSkinParam().getThemeStyle(),
-				dotData.getSkinParam().getIHtmlColorSet());
+		return style.value(PName.BackGroundColor).asColor(dotData.getSkinParam().getIHtmlColorSet());
 	}
 
 	private MinMax minMax;
@@ -140,7 +140,7 @@ public final class SvekResult extends AbstractTextBlock implements IEntityImage 
 			minMax = TextBlockUtils.getMinMax(this, stringBounder, false);
 			dotStringFactory.moveSvek(6 - minMax.getMinX(), 6 - minMax.getMinY());
 		}
-		return XDimension2D.delta(minMax.getDimension(), 0, 12);
+		return minMax.getDimension().delta(0, 12);
 	}
 
 	public ShapeType getShapeType() {

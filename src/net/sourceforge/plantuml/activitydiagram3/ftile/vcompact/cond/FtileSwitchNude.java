@@ -2,14 +2,14 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2023, Arnaud Roques
+ * (C) Copyright 2009-2024, Arnaud Roques
  *
- * Project Info:  http://plantuml.com
+ * Project Info:  https://plantuml.com
  * 
  * If you like this project or if you find it useful, you can support us at:
  * 
- * http://plantuml.com/patreon (only 1$ per month!)
- * http://plantuml.com/paypal
+ * https://plantuml.com/patreon (only 1$ per month!)
+ * https://plantuml.com/paypal
  * 
  * This file is part of PlantUML.
  *
@@ -44,10 +44,10 @@ import java.util.Set;
 import net.sourceforge.plantuml.activitydiagram3.ftile.Ftile;
 import net.sourceforge.plantuml.activitydiagram3.ftile.FtileGeometry;
 import net.sourceforge.plantuml.activitydiagram3.ftile.Swimlane;
-import net.sourceforge.plantuml.awt.geom.XDimension2D;
-import net.sourceforge.plantuml.graphic.StringBounder;
-import net.sourceforge.plantuml.ugraphic.UGraphic;
-import net.sourceforge.plantuml.ugraphic.UTranslate;
+import net.sourceforge.plantuml.klimt.UTranslate;
+import net.sourceforge.plantuml.klimt.drawing.UGraphic;
+import net.sourceforge.plantuml.klimt.font.StringBounder;
+import net.sourceforge.plantuml.klimt.geom.XDimension2D;
 
 public class FtileSwitchNude extends FtileDimensionMemoize {
 
@@ -127,11 +127,11 @@ public class FtileSwitchNude extends FtileDimensionMemoize {
 	protected FtileGeometry calculateDimensionInternalSlow(StringBounder stringBounder) {
 		XDimension2D result = new XDimension2D(0, 0);
 		for (Ftile couple : tiles)
-			result = XDimension2D.mergeLR(result, couple.calculateDimension(stringBounder));
+			result = result.mergeLR(couple.calculateDimension(stringBounder));
 
-		result = XDimension2D.delta(result, xSeparation * (tiles.size() - 1), 100);
+		result = result.delta(xSeparation * (tiles.size() - 1), 100);
 
-		return new FtileGeometry(result, result.getWidth() / 2, 0);
+		return new FtileGeometry(result.getWidth(), result.getHeight(), result.getWidth() / 2, 0);
 	}
 
 }

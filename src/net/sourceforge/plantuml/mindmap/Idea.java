@@ -2,14 +2,14 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2023, Arnaud Roques
+ * (C) Copyright 2009-2024, Arnaud Roques
  *
- * Project Info:  http://plantuml.com
+ * Project Info:  https://plantuml.com
  * 
  * If you like this project or if you find it useful, you can support us at:
  * 
- * http://plantuml.com/patreon (only 1$ per month!)
- * http://plantuml.com/paypal
+ * https://plantuml.com/patreon (only 1$ per month!)
+ * https://plantuml.com/paypal
  * 
  * This file is part of PlantUML.
  *
@@ -40,13 +40,13 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
-import net.sourceforge.plantuml.cucadiagram.Display;
+import net.sourceforge.plantuml.klimt.color.HColor;
+import net.sourceforge.plantuml.klimt.creole.Display;
 import net.sourceforge.plantuml.style.MergeStrategy;
 import net.sourceforge.plantuml.style.SName;
 import net.sourceforge.plantuml.style.Style;
 import net.sourceforge.plantuml.style.StyleBuilder;
 import net.sourceforge.plantuml.style.StyleSignatureBasic;
-import net.sourceforge.plantuml.ugraphic.color.HColor;
 import net.sourceforge.plantuml.wbs.WElement;
 
 class Idea {
@@ -62,24 +62,24 @@ class Idea {
 
 	private StyleSignatureBasic getDefaultStyleDefinitionNode(int level) {
 		final String depth = SName.depth(level);
-		if (level == 0) {
+		if (level == 0)
 			return StyleSignatureBasic.of(SName.root, SName.element, SName.mindmapDiagram, SName.node, SName.rootNode)
-					.add(stereotype).add(depth);
-		}
-		if (shape == IdeaShape.NONE && children.size() == 0) {
+					.addS(stereotype).add(depth);
+
+		if (shape == IdeaShape.NONE && children.size() == 0)
 			return StyleSignatureBasic
 					.of(SName.root, SName.element, SName.mindmapDiagram, SName.node, SName.leafNode, SName.boxless)
-					.add(stereotype).add(depth);
-		}
-		if (shape == IdeaShape.NONE) {
+					.addS(stereotype).add(depth);
+
+		if (shape == IdeaShape.NONE)
 			return StyleSignatureBasic.of(SName.root, SName.element, SName.mindmapDiagram, SName.node, SName.boxless)
-					.add(stereotype).add(depth);
-		}
-		if (children.size() == 0) {
+					.addS(stereotype).add(depth);
+
+		if (children.size() == 0)
 			return StyleSignatureBasic.of(SName.root, SName.element, SName.mindmapDiagram, SName.node, SName.leafNode)
-					.add(stereotype).add(depth);
-		}
-		return StyleSignatureBasic.of(SName.root, SName.element, SName.mindmapDiagram, SName.node).add(stereotype)
+					.addS(stereotype).add(depth);
+
+		return StyleSignatureBasic.of(SName.root, SName.element, SName.mindmapDiagram, SName.node).addS(stereotype)
 				.add(depth);
 	}
 
@@ -100,7 +100,7 @@ class Idea {
 	public Style getStyleArrow() {
 		final String depth = SName.depth(level);
 		final StyleSignatureBasic defaultStyleDefinitionArrow = StyleSignatureBasic
-				.of(SName.root, SName.element, SName.mindmapDiagram, SName.arrow).add(stereotype).add(depth);
+				.of(SName.root, SName.element, SName.mindmapDiagram, SName.arrow).addS(stereotype).add(depth);
 		return defaultStyleDefinitionArrow.getMergedStyle(styleBuilder);
 	}
 

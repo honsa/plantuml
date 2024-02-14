@@ -2,14 +2,14 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2023, Arnaud Roques
+ * (C) Copyright 2009-2024, Arnaud Roques
  *
- * Project Info:  http://plantuml.com
+ * Project Info:  https://plantuml.com
  * 
  * If you like this project or if you find it useful, you can support us at:
  * 
- * http://plantuml.com/patreon (only 1$ per month!)
- * http://plantuml.com/paypal
+ * https://plantuml.com/patreon (only 1$ per month!)
+ * https://plantuml.com/paypal
  * 
  * This file is part of PlantUML.
  *
@@ -35,28 +35,28 @@
  */
 package net.sourceforge.plantuml.svek.image;
 
-import net.sourceforge.plantuml.ISkinParam;
-import net.sourceforge.plantuml.awt.geom.XDimension2D;
-import net.sourceforge.plantuml.cucadiagram.ILeaf;
-import net.sourceforge.plantuml.cucadiagram.Rankdir;
-import net.sourceforge.plantuml.graphic.StringBounder;
+import net.sourceforge.plantuml.abel.Entity;
+import net.sourceforge.plantuml.klimt.Shadowable;
+import net.sourceforge.plantuml.klimt.color.HColor;
+import net.sourceforge.plantuml.klimt.color.HColors;
+import net.sourceforge.plantuml.klimt.drawing.UGraphic;
+import net.sourceforge.plantuml.klimt.font.StringBounder;
+import net.sourceforge.plantuml.klimt.geom.Rankdir;
+import net.sourceforge.plantuml.klimt.geom.XDimension2D;
+import net.sourceforge.plantuml.klimt.shape.URectangle;
+import net.sourceforge.plantuml.style.ISkinParam;
 import net.sourceforge.plantuml.style.PName;
 import net.sourceforge.plantuml.style.SName;
 import net.sourceforge.plantuml.style.Style;
 import net.sourceforge.plantuml.style.StyleSignatureBasic;
 import net.sourceforge.plantuml.svek.AbstractEntityImage;
 import net.sourceforge.plantuml.svek.ShapeType;
-import net.sourceforge.plantuml.ugraphic.Shadowable;
-import net.sourceforge.plantuml.ugraphic.UGraphic;
-import net.sourceforge.plantuml.ugraphic.URectangle;
-import net.sourceforge.plantuml.ugraphic.color.HColor;
-import net.sourceforge.plantuml.ugraphic.color.HColors;
 
 public class EntityImageSynchroBar extends AbstractEntityImage {
 
 	// private final SName styleName;
 
-	public EntityImageSynchroBar(ILeaf entity, ISkinParam skinParam, SName styleName) {
+	public EntityImageSynchroBar(Entity entity, ISkinParam skinParam, SName styleName) {
 		super(entity, skinParam);
 		// this.styleName = styleName;
 	}
@@ -74,12 +74,11 @@ public class EntityImageSynchroBar extends AbstractEntityImage {
 
 	final public void drawU(UGraphic ug) {
 		final XDimension2D dim = calculateDimension(ug.getStringBounder());
-		final Shadowable rect = new URectangle(dim.getWidth(), dim.getHeight());
+		final Shadowable rect = URectangle.build(dim.getWidth(), dim.getHeight());
 
 		final Style style = getStyleSignature().withTOBECHANGED(getEntity().getStereotype())
 				.getMergedStyle(getSkinParam().getCurrentStyleBuilder());
-		final HColor color = style.value(PName.BackGroundColor).asColor(getSkinParam().getThemeStyle(),
-				getSkinParam().getIHtmlColorSet());
+		final HColor color = style.value(PName.BackGroundColor).asColor(getSkinParam().getIHtmlColorSet());
 		final double shadowing = style.value(PName.Shadowing).asDouble();
 
 		rect.setDeltaShadow(shadowing);

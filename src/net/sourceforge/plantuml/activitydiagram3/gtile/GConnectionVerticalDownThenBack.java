@@ -2,14 +2,14 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2023, Arnaud Roques
+ * (C) Copyright 2009-2024, Arnaud Roques
  *
- * Project Info:  http://plantuml.com
+ * Project Info:  https://plantuml.com
  * 
  * If you like this project or if you find it useful, you can support us at:
  * 
- * http://plantuml.com/patreon (only 1$ per month!)
- * http://plantuml.com/paypal
+ * https://plantuml.com/patreon (only 1$ per month!)
+ * https://plantuml.com/paypal
  * 
  * This file is part of PlantUML.
  *
@@ -35,15 +35,14 @@
  */
 package net.sourceforge.plantuml.activitydiagram3.gtile;
 
-import net.sourceforge.plantuml.Direction;
-import net.sourceforge.plantuml.activitydiagram3.ftile.Arrows;
 import net.sourceforge.plantuml.activitydiagram3.ftile.Snake;
-import net.sourceforge.plantuml.awt.geom.XPoint2D;
-import net.sourceforge.plantuml.graphic.HorizontalAlignment;
-import net.sourceforge.plantuml.graphic.TextBlock;
-import net.sourceforge.plantuml.ugraphic.UGraphic;
-import net.sourceforge.plantuml.ugraphic.UPolygon;
-import net.sourceforge.plantuml.ugraphic.UTranslate;
+import net.sourceforge.plantuml.klimt.UTranslate;
+import net.sourceforge.plantuml.klimt.drawing.UGraphic;
+import net.sourceforge.plantuml.klimt.geom.HorizontalAlignment;
+import net.sourceforge.plantuml.klimt.geom.XPoint2D;
+import net.sourceforge.plantuml.klimt.shape.TextBlock;
+import net.sourceforge.plantuml.klimt.shape.UPolygon;
+import net.sourceforge.plantuml.utils.Direction;
 
 public class GConnectionVerticalDownThenBack extends GAbstractConnection {
 
@@ -66,7 +65,7 @@ public class GConnectionVerticalDownThenBack extends GAbstractConnection {
 	public void drawU(UGraphic ug) {
 		final XPoint2D p1 = pos1.getTranslated(gpoint1.getPoint2D());
 		final XPoint2D p2 = pos2.getTranslated(gpoint2.getPoint2D());
-		final UPolygon arrow = Arrows.asToLeft();
+		final UPolygon arrow = skinParam().arrows().asToLeft();
 		final Snake snake = Snake.create(skinParam(), getInLinkRenderingColor(), arrow)
 				.withLabel(textBlock, HorizontalAlignment.LEFT).emphasizeDirection(Direction.UP);
 
@@ -92,7 +91,7 @@ public class GConnectionVerticalDownThenBack extends GAbstractConnection {
 		p1 = translate1.getTranslated(p1);
 		p2 = translate2.getTranslated(p2);
 
-		final UPolygon arrow = Arrows.asToLeft();
+		final UPolygon arrow = skinParam().arrows().asToLeft();
 		final Snake snake = Snake.create(skinParam(), getInLinkRenderingColor(), arrow)
 				.withLabel(textBlock, HorizontalAlignment.LEFT).emphasizeDirection(Direction.UP);
 

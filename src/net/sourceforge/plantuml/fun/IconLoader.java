@@ -2,14 +2,14 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2023, Arnaud Roques
+ * (C) Copyright 2009-2024, Arnaud Roques
  *
- * Project Info:  http://plantuml.com
+ * Project Info:  https://plantuml.com
  * 
  * If you like this project or if you find it useful, you can support us at:
  * 
- * http://plantuml.com/patreon (only 1$ per month!)
- * http://plantuml.com/paypal
+ * https://plantuml.com/patreon (only 1$ per month!)
+ * https://plantuml.com/paypal
  * 
  * This file is part of PlantUML.
  *
@@ -47,8 +47,9 @@ import net.sourceforge.plantuml.log.Logme;
 import net.sourceforge.plantuml.security.SImageIO;
 
 public class IconLoader {
+    // ::remove folder when __HAXE__
 
-	private static final int NUMBER_OF_ICONS = 30;
+	private static final int NUMBER_OF_ICONS = 31;
 
 	private final static Map<String, BufferedImage> all = new ConcurrentHashMap<String, BufferedImage>();
 	static private final List<String> tmp = new ArrayList<>();
@@ -61,9 +62,9 @@ public class IconLoader {
 	private static String getSomeQuote() {
 		synchronized (tmp) {
 			if (tmp.size() == 0) {
-				for (int i = 0; i < NUMBER_OF_ICONS; i++) {
+				for (int i = 0; i < NUMBER_OF_ICONS; i++)
 					tmp.add("sprite" + String.format("%03d", i) + ".png");
-				}
+
 				Collections.shuffle(tmp);
 			}
 			final int size = tmp.size();
@@ -77,9 +78,9 @@ public class IconLoader {
 		BufferedImage result = all.get(name);
 		if (result == null) {
 			result = getIconSlow(name);
-			if (result != null) {
+			if (result != null)
 				all.put(name, result);
-			}
+
 		}
 		return result;
 	}
@@ -87,9 +88,9 @@ public class IconLoader {
 	private static BufferedImage getIconSlow(String name) {
 		try {
 			final InputStream is = IconLoader.class.getResourceAsStream(name);
-			if (is == null) {
+			if (is == null)
 				return null;
-			}
+
 			final BufferedImage image = SImageIO.read(is);
 			is.close();
 			return image;
@@ -100,19 +101,18 @@ public class IconLoader {
 	}
 
 	private static BufferedImage addTransparent(BufferedImage ico) {
-		if (ico == null) {
+		if (ico == null)
 			return null;
-		}
+
 		final BufferedImage transparentIcon = new BufferedImage(ico.getWidth(), ico.getHeight(),
 				BufferedImage.TYPE_INT_ARGB_PRE);
-		for (int i = 0; i < ico.getWidth(); i++) {
+		for (int i = 0; i < ico.getWidth(); i++)
 			for (int j = 0; j < ico.getHeight(); j++) {
 				final int col = ico.getRGB(i, j);
-				if (col != ico.getRGB(0, 0)) {
+				if (col != ico.getRGB(0, 0))
 					transparentIcon.setRGB(i, j, col);
-				}
 			}
-		}
+
 		return transparentIcon;
 	}
 

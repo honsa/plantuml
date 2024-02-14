@@ -2,14 +2,14 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2023, Arnaud Roques
+ * (C) Copyright 2009-2024, Arnaud Roques
  *
- * Project Info:  http://plantuml.com
+ * Project Info:  https://plantuml.com
  * 
  * If you like this project or if you find it useful, you can support us at:
  * 
- * http://plantuml.com/patreon (only 1$ per month!)
- * http://plantuml.com/paypal
+ * https://plantuml.com/patreon (only 1$ per month!)
+ * https://plantuml.com/paypal
  * 
  * This file is part of PlantUML.
  *
@@ -35,10 +35,9 @@
  */
 package net.sourceforge.plantuml.activitydiagram;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
-import net.sourceforge.plantuml.ISkinSimple;
 import net.sourceforge.plantuml.activitydiagram.command.CommandElse;
 import net.sourceforge.plantuml.activitydiagram.command.CommandEndPartition;
 import net.sourceforge.plantuml.activitydiagram.command.CommandEndif;
@@ -46,7 +45,6 @@ import net.sourceforge.plantuml.activitydiagram.command.CommandIf;
 import net.sourceforge.plantuml.activitydiagram.command.CommandLinkActivity;
 import net.sourceforge.plantuml.activitydiagram.command.CommandLinkLongActivity;
 import net.sourceforge.plantuml.activitydiagram.command.CommandPartition;
-import net.sourceforge.plantuml.api.ThemeStyle;
 import net.sourceforge.plantuml.classdiagram.command.CommandHideShow2;
 import net.sourceforge.plantuml.command.Command;
 import net.sourceforge.plantuml.command.CommandFootboxIgnored;
@@ -58,15 +56,15 @@ import net.sourceforge.plantuml.command.note.CommandFactoryNoteOnLink;
 import net.sourceforge.plantuml.core.UmlSource;
 
 public class ActivityDiagramFactory extends PSystemCommandFactory {
+    // ::remove folder when __HAXE__
 
 	@Override
-	public ActivityDiagram createEmptyDiagram(ThemeStyle style, UmlSource source, ISkinSimple skinParam) {
-		return new ActivityDiagram(style, source, skinParam);
+	public ActivityDiagram createEmptyDiagram(UmlSource source, Map<String, String> skinParam) {
+		return new ActivityDiagram(source, skinParam);
 	}
 
 	@Override
-	protected List<Command> createCommands() {
-		final List<Command> cmds = new ArrayList<>();
+	protected void initCommandsList(List<Command> cmds) {
 		cmds.add(new CommandFootboxIgnored());
 		CommonCommands.addCommonCommands1(cmds);
 		cmds.add(new CommandRankDir());
@@ -90,8 +88,6 @@ public class ActivityDiagramFactory extends PSystemCommandFactory {
 		cmds.add(new CommandLinkActivity());
 		cmds.add(new CommandHideShow2());
 		// addCommand(new CommandInnerConcurrent(system));
-
-		return cmds;
 
 	}
 

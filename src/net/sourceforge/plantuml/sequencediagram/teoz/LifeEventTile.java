@@ -2,14 +2,14 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2023, Arnaud Roques
+ * (C) Copyright 2009-2024, Arnaud Roques
  *
- * Project Info:  http://plantuml.com
+ * Project Info:  https://plantuml.com
  * 
  * If you like this project or if you find it useful, you can support us at:
  * 
- * http://plantuml.com/patreon (only 1$ per month!)
- * http://plantuml.com/paypal
+ * https://plantuml.com/patreon (only 1$ per month!)
+ * https://plantuml.com/paypal
  * 
  * This file is part of PlantUML.
  *
@@ -35,8 +35,9 @@
  */
 package net.sourceforge.plantuml.sequencediagram.teoz;
 
-import net.sourceforge.plantuml.ISkinParam;
-import net.sourceforge.plantuml.awt.geom.XDimension2D;
+import net.sourceforge.plantuml.klimt.UTranslate;
+import net.sourceforge.plantuml.klimt.drawing.UGraphic;
+import net.sourceforge.plantuml.klimt.geom.XDimension2D;
 import net.sourceforge.plantuml.real.Real;
 import net.sourceforge.plantuml.real.RealUtils;
 import net.sourceforge.plantuml.sequencediagram.Event;
@@ -46,10 +47,9 @@ import net.sourceforge.plantuml.skin.Component;
 import net.sourceforge.plantuml.skin.ComponentType;
 import net.sourceforge.plantuml.skin.Context2D;
 import net.sourceforge.plantuml.skin.rose.Rose;
+import net.sourceforge.plantuml.style.ISkinParam;
 import net.sourceforge.plantuml.style.Style;
 import net.sourceforge.plantuml.style.StyleSignatureBasic;
-import net.sourceforge.plantuml.ugraphic.UGraphic;
-import net.sourceforge.plantuml.ugraphic.UTranslate;
 
 public class LifeEventTile extends AbstractTile {
 
@@ -58,12 +58,14 @@ public class LifeEventTile extends AbstractTile {
 	private final LivingSpace livingSpace;
 	private final Rose skin;
 	private final ISkinParam skinParam;
+	private final YGauge yGauge;
 
 	@Override
-	final protected void callbackY_internal(double y) {
+	final protected void callbackY_internal(TimeHook y) {
+		super.callbackY_internal(y);
 		// System.err.println("LifeEventTile::updateStairs " + lifeEvent + " " +
 		// livingSpace.getParticipant() + " y=" + y);
-		livingSpace.addStepForLivebox(getEvent(), y);
+		livingSpace.addStepForLivebox(getEvent(), y.getValue());
 	}
 
 	public Event getEvent() {
@@ -76,13 +78,19 @@ public class LifeEventTile extends AbstractTile {
 	}
 
 	public LifeEventTile(LifeEvent lifeEvent, TileArguments tileArguments, LivingSpace livingSpace, Rose skin,
-			ISkinParam skinParam) {
-		super(tileArguments.getStringBounder());
+			ISkinParam skinParam, YGauge currentY) {
+		super(tileArguments.getStringBounder(), currentY);
 		this.lifeEvent = lifeEvent;
 		this.tileArguments = tileArguments;
 		this.livingSpace = livingSpace;
 		this.skin = skin;
 		this.skinParam = skinParam;
+		this.yGauge = YGauge.create(currentY.getMax(), getPreferredHeight());
+	}
+
+	@Override
+	public YGauge getYGauge() {
+		return yGauge;
 	}
 
 	private StyleSignatureBasic getStyleSignature() {
@@ -90,6 +98,8 @@ public class LifeEventTile extends AbstractTile {
 	}
 
 	public void drawU(UGraphic ug) {
+		if (YGauge.USE_ME)
+			ug = ug.apply(UTranslate.dy(getYGauge().getMin().getCurrentValue()));
 		if (isDestroyWithoutMessage()) {
 			final Style style = getStyleSignature().getMergedStyle(skinParam.getCurrentStyleBuilder());
 			final Component cross = skin.createComponent(new Style[] { style }, ComponentType.DESTROY, null, skinParam,

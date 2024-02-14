@@ -2,14 +2,14 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2023, Arnaud Roques
+ * (C) Copyright 2009-2024, Arnaud Roques
  *
- * Project Info:  http://plantuml.com
+ * Project Info:  https://plantuml.com
  * 
  * If you like this project or if you find it useful, you can support us at:
  * 
- * http://plantuml.com/patreon (only 1$ per month!)
- * http://plantuml.com/paypal
+ * https://plantuml.com/patreon (only 1$ per month!)
+ * https://plantuml.com/paypal
  * 
  * This file is part of PlantUML.
  *
@@ -41,18 +41,20 @@ import java.io.OutputStream;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 
-import net.sourceforge.plantuml.Log;
 import net.sourceforge.plantuml.UmlDiagram;
-import net.sourceforge.plantuml.cucadiagram.CucaDiagram;
+import net.sourceforge.plantuml.cucadiagram.ICucaDiagram;
 import net.sourceforge.plantuml.descdiagram.DescriptionDiagram;
 import net.sourceforge.plantuml.log.Logme;
+import net.sourceforge.plantuml.utils.Log;
 import net.sourceforge.plantuml.xmi.XmlDiagramTransformer;
 
 public final class CucaDiagramGraphmlMaker {
+    // ::remove folder when __HAXE__
+	// ::remove folder when __CORE__
 
-	private final CucaDiagram diagram;
+	private final ICucaDiagram diagram;
 
-	public CucaDiagramGraphmlMaker(CucaDiagram diagram) throws IOException {
+	public CucaDiagramGraphmlMaker(ICucaDiagram diagram) throws IOException {
 		this.diagram = diagram;
 	}
 

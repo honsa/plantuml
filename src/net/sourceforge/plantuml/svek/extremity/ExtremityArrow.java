@@ -2,14 +2,14 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2023, Arnaud Roques
+ * (C) Copyright 2009-2024, Arnaud Roques
  *
- * Project Info:  http://plantuml.com
+ * Project Info:  https://plantuml.com
  * 
  * If you like this project or if you find it useful, you can support us at:
  * 
- * http://plantuml.com/patreon (only 1$ per month!)
- * http://plantuml.com/paypal
+ * https://plantuml.com/patreon (only 1$ per month!)
+ * https://plantuml.com/paypal
  * 
  * This file is part of PlantUML.
  *
@@ -35,15 +35,15 @@
  */
 package net.sourceforge.plantuml.svek.extremity;
 
-import net.sourceforge.plantuml.awt.geom.XPoint2D;
-import net.sourceforge.plantuml.ugraphic.UGraphic;
-import net.sourceforge.plantuml.ugraphic.ULine;
-import net.sourceforge.plantuml.ugraphic.UPolygon;
-import net.sourceforge.plantuml.ugraphic.UTranslate;
-import net.sourceforge.plantuml.ugraphic.color.HColor;
-import net.sourceforge.plantuml.ugraphic.color.HColors;
+import net.sourceforge.plantuml.klimt.UTranslate;
+import net.sourceforge.plantuml.klimt.color.HColor;
+import net.sourceforge.plantuml.klimt.color.HColors;
+import net.sourceforge.plantuml.klimt.drawing.UGraphic;
+import net.sourceforge.plantuml.klimt.geom.XPoint2D;
+import net.sourceforge.plantuml.klimt.shape.ULine;
+import net.sourceforge.plantuml.klimt.shape.UPolygon;
 
-class ExtremityArrow extends Extremity {
+public class ExtremityArrow extends Extremity {
 
 	private UPolygon polygon = new UPolygon();
 	private final ULine line;
@@ -85,17 +85,30 @@ class ExtremityArrow extends Extremity {
 		return xContact;
 	}
 
+	@Override
+	public double getDecorationLength() {
+		return 6;
+	}
+
 	public void drawU(UGraphic ug) {
 		final HColor color = ug.getParam().getColor();
-		if (color == null) {
+		if (color == null)
 			ug = ug.apply(HColors.none().bg());
-		} else {
+		else
 			ug = ug.apply(color.bg());
-		}
+
 		ug.draw(polygon);
-		if (line != null && line.getLength() > 2) {
-			ug.apply(new UTranslate(contact)).draw(line);
-		}
+		if (line != null && line.getLength() > 2)
+			ug.apply(UTranslate.point(contact)).draw(line);
+
+	}
+
+	public void drawLineIfTransparent(UGraphic ug) {
+		final XPoint2D pt1 = polygon.getPoint(0);
+		final XPoint2D pt2 = polygon.getPoint(2);
+		final ULine line = ULine.create(pt1, pt2);
+		ug.apply(UTranslate.point(pt1)).draw(line);
+
 	}
 
 }

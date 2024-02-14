@@ -2,14 +2,14 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2023, Arnaud Roques
+ * (C) Copyright 2009-2024, Arnaud Roques
  *
- * Project Info:  http://plantuml.com
+ * Project Info:  https://plantuml.com
  * 
  * If you like this project or if you find it useful, you can support us at:
  * 
- * http://plantuml.com/patreon (only 1$ per month!)
- * http://plantuml.com/paypal
+ * https://plantuml.com/patreon (only 1$ per month!)
+ * https://plantuml.com/paypal
  * 
  * This file is part of PlantUML.
  *
@@ -44,9 +44,6 @@ import java.nio.charset.Charset;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import net.sourceforge.plantuml.LineLocation;
-import net.sourceforge.plantuml.Log;
-import net.sourceforge.plantuml.StringLocated;
 import net.sourceforge.plantuml.StringUtils;
 import net.sourceforge.plantuml.log.Logme;
 import net.sourceforge.plantuml.preproc.ReadLine;
@@ -55,7 +52,10 @@ import net.sourceforge.plantuml.preproc.ReadLineSimple;
 import net.sourceforge.plantuml.preproc.StartDiagramExtractReader;
 import net.sourceforge.plantuml.preproc.Stdlib;
 import net.sourceforge.plantuml.security.SURL;
+import net.sourceforge.plantuml.text.StringLocated;
 import net.sourceforge.plantuml.tim.EaterException;
+import net.sourceforge.plantuml.utils.LineLocation;
+import net.sourceforge.plantuml.utils.Log;
 
 public class PreprocessorUtils {
 
@@ -93,6 +93,22 @@ public class PreprocessorUtils {
 		// Log.info("Loading sdlib " + filename + " ok");
 		return result;
 	}
+
+	// ::comment when __CORE__
+	public static ReadLine getReaderNonstandardInclude(StringLocated s, String filename) {
+		if (filename.endsWith(".puml") == false)
+			filename = filename + ".puml";
+		Log.info("Loading non standard " + filename);
+		final String res = "/stdlib/" + filename;
+		InputStream is = Stdlib.class.getResourceAsStream(res);
+
+		if (is == null)
+			return null;
+
+		final String description = "[" + filename + "]";
+		return ReadLineReader.create(new InputStreamReader(is), description);
+	}
+	// ::done
 
 	public static ReadLine getReaderStdlibInclude(StringLocated s, String filename) {
 		Log.info("Loading sdlib " + filename);

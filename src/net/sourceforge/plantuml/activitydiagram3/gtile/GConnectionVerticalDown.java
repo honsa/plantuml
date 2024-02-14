@@ -2,14 +2,14 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2023, Arnaud Roques
+ * (C) Copyright 2009-2024, Arnaud Roques
  *
- * Project Info:  http://plantuml.com
+ * Project Info:  https://plantuml.com
  * 
  * If you like this project or if you find it useful, you can support us at:
  * 
- * http://plantuml.com/patreon (only 1$ per month!)
- * http://plantuml.com/paypal
+ * https://plantuml.com/patreon (only 1$ per month!)
+ * https://plantuml.com/paypal
  * 
  * This file is part of PlantUML.
  *
@@ -35,13 +35,12 @@
  */
 package net.sourceforge.plantuml.activitydiagram3.gtile;
 
-import net.sourceforge.plantuml.activitydiagram3.ftile.Arrows;
 import net.sourceforge.plantuml.activitydiagram3.ftile.Snake;
-import net.sourceforge.plantuml.awt.geom.XPoint2D;
-import net.sourceforge.plantuml.graphic.HorizontalAlignment;
-import net.sourceforge.plantuml.graphic.TextBlock;
-import net.sourceforge.plantuml.ugraphic.UGraphic;
-import net.sourceforge.plantuml.ugraphic.UTranslate;
+import net.sourceforge.plantuml.klimt.UTranslate;
+import net.sourceforge.plantuml.klimt.drawing.UGraphic;
+import net.sourceforge.plantuml.klimt.geom.HorizontalAlignment;
+import net.sourceforge.plantuml.klimt.geom.XPoint2D;
+import net.sourceforge.plantuml.klimt.shape.TextBlock;
 
 public class GConnectionVerticalDown extends GAbstractConnection {
 
@@ -60,8 +59,8 @@ public class GConnectionVerticalDown extends GAbstractConnection {
 
 	@Override
 	public void drawTranslate(UGraphic ug, UTranslate translate1, UTranslate translate2) {
-		final Snake snake = Snake.create(skinParam(), getInLinkRenderingColor(), Arrows.asToDown()).withLabel(textBlock,
-				HorizontalAlignment.LEFT);
+		final Snake snake = Snake.create(skinParam(), getInLinkRenderingColor(), skinParam().arrows().asToDown())
+				.withLabel(textBlock, HorizontalAlignment.LEFT);
 		final XPoint2D p1 = pos1.getTranslated(gpoint1.getPoint2D());
 		final XPoint2D p2 = pos2.getTranslated(gpoint2.getPoint2D());
 		final XPoint2D mp1a = translate1.getTranslated(p1);
@@ -77,8 +76,8 @@ public class GConnectionVerticalDown extends GAbstractConnection {
 
 	@Override
 	public void drawU(UGraphic ug) {
-		final Snake snake = Snake.create(skinParam(), getInLinkRenderingColor(), Arrows.asToDown()).withLabel(textBlock,
-				HorizontalAlignment.LEFT);
+		final Snake snake = Snake.create(skinParam(), getInLinkRenderingColor(), skinParam().arrows().asToDown())
+				.withLabel(textBlock, HorizontalAlignment.LEFT);
 		final XPoint2D p1 = pos1.getTranslated(gpoint1.getPoint2D());
 		final XPoint2D p2 = pos2.getTranslated(gpoint2.getPoint2D());
 		snake.addPoint(p1);
