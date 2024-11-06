@@ -202,7 +202,7 @@ public class ActivityDiagram3 extends UmlDiagram {
 	protected ImageData exportDiagramInternal(OutputStream os, int index, FileFormatOption fileFormatOption)
 			throws IOException {
 		final StringBounder stringBounder = fileFormatOption.getDefaultStringBounder(getSkinParam());
-		TextBlock result = getTextBlock(stringBounder);
+		final TextBlock result = getTextBlock(stringBounder);
 		return createImageBuilder(fileFormatOption).drawable(result).write(os);
 	}
 
@@ -360,10 +360,10 @@ public class ActivityDiagram3 extends UmlDiagram {
 		return CommandExecutionResult.error("Cannot find if");
 	}
 
-	public void startRepeat(HColor color, Display label, BoxStyle boxStyleIn, Colors colors) {
+	public void startRepeat(HColor color, Display label, BoxStyle boxStyleIn, Colors colors, Stereotype stereotype) {
 		manageSwimlaneStrategy();
 		final InstructionRepeat instructionRepeat = new InstructionRepeat(swinlanes, current(), nextLinkRenderer(),
-				color, label, boxStyleIn, colors);
+				color, label, boxStyleIn, colors, stereotype);
 		current().add(instructionRepeat);
 		setCurrent(instructionRepeat);
 		setNextLinkRendererInternal(LinkRendering.none());
@@ -486,8 +486,9 @@ public class ActivityDiagram3 extends UmlDiagram {
 		setNextLink(link);
 	}
 
-	public CommandExecutionResult addNote(Display note, NotePosition position, NoteType type, Colors colors) {
-		final boolean ok = current().addNote(note, position, type, colors, swinlanes.getCurrentSwimlane());
+	public CommandExecutionResult addNote(Display note, NotePosition position, NoteType type, Colors colors,
+			Stereotype stereotype) {
+		final boolean ok = current().addNote(note, position, type, colors, swinlanes.getCurrentSwimlane(), stereotype);
 		if (ok == false)
 			return CommandExecutionResult.error("Cannot add note here");
 

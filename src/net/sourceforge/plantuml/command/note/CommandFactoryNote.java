@@ -43,6 +43,7 @@ import net.sourceforge.plantuml.command.Command;
 import net.sourceforge.plantuml.command.CommandExecutionResult;
 import net.sourceforge.plantuml.command.CommandMultilines2;
 import net.sourceforge.plantuml.command.MultilinesStrategy;
+import net.sourceforge.plantuml.command.ParserPass;
 import net.sourceforge.plantuml.command.SingleLineCommand2;
 import net.sourceforge.plantuml.command.Trim;
 import net.sourceforge.plantuml.klimt.color.ColorParser;
@@ -102,7 +103,7 @@ public final class CommandFactoryNote implements SingleMultiFactoryCommand<Abstr
 
 			@Override
 			protected CommandExecutionResult executeArg(final AbstractEntityDiagram system, LineLocation location,
-					RegexResult arg) throws NoSuchColorException {
+					RegexResult arg, ParserPass currentPass) throws NoSuchColorException {
 				final String display = arg.get("DISPLAY", 0);
 				return executeInternal(system, arg, BlocLines.getWithNewlines(display));
 			}
@@ -119,7 +120,8 @@ public final class CommandFactoryNote implements SingleMultiFactoryCommand<Abstr
 				return "^[%s]*end[%s]?note$";
 			}
 
-			protected CommandExecutionResult executeNow(final AbstractEntityDiagram system, BlocLines lines)
+			@Override
+			protected CommandExecutionResult executeNow(final AbstractEntityDiagram system, BlocLines lines, ParserPass currentPass)
 					throws NoSuchColorException {
 				// StringUtils.trim(lines, false);
 				final RegexResult line0 = getStartingPattern().matcher(lines.getFirst().getTrimmed().getString());

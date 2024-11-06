@@ -41,7 +41,6 @@ import java.util.List;
 
 import net.sourceforge.plantuml.abel.DisplayPositioned;
 import net.sourceforge.plantuml.abel.Entity;
-import net.sourceforge.plantuml.abel.EntityPortion;
 import net.sourceforge.plantuml.abel.GroupType;
 import net.sourceforge.plantuml.activitydiagram3.ftile.EntityImageLegend;
 import net.sourceforge.plantuml.cucadiagram.PortionShower;
@@ -160,8 +159,8 @@ public final class ClusterHeader {
 		if (stereos == null)
 			return TextBlockUtils.empty(0, 0);
 
-		final boolean show = portionShower.showPortion(EntityPortion.STEREOTYPE, g);
-		if (show == false)
+		final List<String> visibleStereotypes = portionShower.getVisibleStereotypeLabels(g);
+		if (visibleStereotypes == null || visibleStereotypes.isEmpty())
 			return TextBlockUtils.empty(0, 0);
 
 		final Style style = Cluster
@@ -169,7 +168,7 @@ public final class ClusterHeader {
 				.forStereotypeItself(g.getStereotype()).getMergedStyle(skinParam.getCurrentStyleBuilder());
 
 		final FontConfiguration fontConfiguration = style.getFontConfiguration(skinParam.getIHtmlColorSet());
-		return Display.create(stereos).create(fontConfiguration, HorizontalAlignment.CENTER, skinParam);
+		return Display.create(visibleStereotypes).create(fontConfiguration, HorizontalAlignment.CENTER, skinParam);
 
 	}
 

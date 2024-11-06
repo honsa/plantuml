@@ -43,6 +43,7 @@ import net.sourceforge.plantuml.command.Command;
 import net.sourceforge.plantuml.command.CommandExecutionResult;
 import net.sourceforge.plantuml.command.CommandMultilines2;
 import net.sourceforge.plantuml.command.MultilinesStrategy;
+import net.sourceforge.plantuml.command.ParserPass;
 import net.sourceforge.plantuml.command.SingleLineCommand2;
 import net.sourceforge.plantuml.command.Trim;
 import net.sourceforge.plantuml.klimt.color.ColorParser;
@@ -61,6 +62,12 @@ import net.sourceforge.plantuml.utils.LineLocation;
 import net.sourceforge.plantuml.utils.Position;
 
 public final class CommandFactoryNoteOnLink implements SingleMultiFactoryCommand<CucaDiagram> {
+	
+	private final ParserPass selectedpass;
+
+	public CommandFactoryNoteOnLink(ParserPass selectedpass) {
+		this.selectedpass = selectedpass;
+	}
 
 	private IRegex getRegexConcatSingleLine() {
 		return RegexConcat.build(CommandFactoryNoteOnLink.class.getName() + "single", RegexLeaf.start(), //
@@ -105,7 +112,8 @@ public final class CommandFactoryNoteOnLink implements SingleMultiFactoryCommand
 				return "^end[%s]?note$";
 			}
 
-			protected CommandExecutionResult executeNow(final CucaDiagram system, BlocLines lines)
+			@Override
+			protected CommandExecutionResult executeNow(final CucaDiagram system, BlocLines lines, ParserPass currentPass)
 					throws NoSuchColorException {
 				final String line0 = lines.getFirst().getTrimmed().getString();
 				lines = lines.subExtract(1, 1);
@@ -116,6 +124,12 @@ public final class CommandFactoryNoteOnLink implements SingleMultiFactoryCommand
 				}
 				return CommandExecutionResult.error("No note defined");
 			}
+			
+			@Override
+			public boolean isEligibleFor(ParserPass pass) {
+				return pass == selectedpass;
+			}
+
 
 		};
 	}
@@ -125,9 +139,14 @@ public final class CommandFactoryNoteOnLink implements SingleMultiFactoryCommand
 
 			@Override
 			protected CommandExecutionResult executeArg(final CucaDiagram system, LineLocation location,
-					RegexResult arg) throws NoSuchColorException {
+					RegexResult arg, ParserPass currentPass) throws NoSuchColorException {
 				final BlocLines note = BlocLines.getWithNewlines(arg.get("NOTE", 0));
 				return executeInternal(system, note, arg);
+			}
+			
+			@Override
+			public boolean isEligibleFor(ParserPass pass) {
+				return pass == selectedpass;
 			}
 		};
 	}

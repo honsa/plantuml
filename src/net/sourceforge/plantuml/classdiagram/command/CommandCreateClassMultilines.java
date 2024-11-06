@@ -44,6 +44,7 @@ import net.sourceforge.plantuml.classdiagram.ClassDiagram;
 import net.sourceforge.plantuml.command.CommandExecutionResult;
 import net.sourceforge.plantuml.command.CommandMultilines2;
 import net.sourceforge.plantuml.command.MultilinesStrategy;
+import net.sourceforge.plantuml.command.ParserPass;
 import net.sourceforge.plantuml.command.Trim;
 import net.sourceforge.plantuml.decoration.LinkDecor;
 import net.sourceforge.plantuml.decoration.LinkType;
@@ -127,10 +128,16 @@ public class CommandCreateClassMultilines extends CommandMultilines2<ClassDiagra
 						new RegexLeaf("LINECOLOR", "(?:\\[(dotted|dashed|bold)\\])?(\\w+)?"))), //
 				new RegexOptional(new RegexConcat(RegexLeaf.spaceOneOrMore(),
 						new RegexLeaf("EXTENDS",
-								"(extends)[%s]+(" + CommandCreateClassMultilines.CODES + "|[%g]([^%g]+)[%g])"))), //
+								"(extends)[%s]+(" + CommandCreateClassMultilines.CODES + "|[%g]([^%g]+)[%g])"),
+						new RegexOptional(new RegexConcat(RegexLeaf.spaceZeroOrMore(),
+								new RegexLeaf("\\<(" + GenericRegexProducer.PATTERN + ")\\>"))) //
+				)), //
 				new RegexOptional(new RegexConcat(RegexLeaf.spaceOneOrMore(),
 						new RegexLeaf("IMPLEMENTS",
-								"(implements)[%s]+(" + CommandCreateClassMultilines.CODES + "|[%g]([^%g]+)[%g])"))), //
+								"(implements)[%s]+(" + CommandCreateClassMultilines.CODES + "|[%g]([^%g]+)[%g])"),
+						new RegexOptional(new RegexConcat(RegexLeaf.spaceZeroOrMore(),
+								new RegexLeaf("\\<(" + GenericRegexProducer.PATTERN + ")\\>"))) //
+				)), //
 				RegexLeaf.spaceZeroOrMore(), //
 				new RegexLeaf("\\{"), //
 				RegexLeaf.spaceZeroOrMore(), //
@@ -148,7 +155,7 @@ public class CommandCreateClassMultilines extends CommandMultilines2<ClassDiagra
 	}
 
 	@Override
-	protected CommandExecutionResult executeNow(ClassDiagram diagram, BlocLines lines) throws NoSuchColorException {
+	protected CommandExecutionResult executeNow(ClassDiagram diagram, BlocLines lines, ParserPass currentPass) throws NoSuchColorException {
 		lines = lines.trimSmart(1);
 		final RegexResult line0 = getStartingPattern().matcher(lines.getFirst().getTrimmed().getString());
 		final String typeString = StringUtils.goUpperCase(line0.get("TYPE", 0));
@@ -287,9 +294,9 @@ public class CommandCreateClassMultilines extends CommandMultilines2<ClassDiagra
 					typeLink = typeLink.goDashed();
 
 				final LinkArg linkArg = LinkArg.noDisplay(2);
-				final Link link = new Link(diagram.getEntityFactory(), diagram.getSkinParam().getCurrentStyleBuilder(),
-						cl2, entity, typeLink, linkArg.withQuantifier(null, null)
-								.withDistanceAngle(diagram.getLabeldistance(), diagram.getLabelangle()));
+				final Link link = new Link(diagram, diagram.getSkinParam().getCurrentStyleBuilder(),
+						cl2, entity, typeLink, linkArg.withQuantifier(null, null).withDistanceAngle(diagram.getLabeldistance(),
+								diagram.getLabelangle()));
 				diagram.addLink(link);
 			}
 		}

@@ -42,12 +42,12 @@ import java.util.Map;
 
 import com.plantuml.api.cheerpj.WasmLog;
 
-import net.sourceforge.plantuml.acearth.PSystemXearthFactory;
 import net.sourceforge.plantuml.activitydiagram.ActivityDiagramFactory;
 import net.sourceforge.plantuml.activitydiagram3.ActivityDiagramFactory3;
 import net.sourceforge.plantuml.api.PSystemFactory;
 import net.sourceforge.plantuml.board.BoardDiagramFactory;
 import net.sourceforge.plantuml.bpm.BpmDiagramFactory;
+import net.sourceforge.plantuml.cheneer.ChenEerDiagramFactory;
 import net.sourceforge.plantuml.chronology.ChronologyDiagramFactory;
 import net.sourceforge.plantuml.classdiagram.ClassDiagramFactory;
 import net.sourceforge.plantuml.core.Diagram;
@@ -248,9 +248,6 @@ public class PSystemBuilder {
 		// ::done
 
 		factories.add(new PSystemCharlieFactory());
-		// ::comment when __CORE__ or __MIT__ or __EPL__ or __BSD__ or __ASL__ or __LGPL__
-		factories.add(new PSystemXearthFactory());
-		// ::done
 
 		factories.add(new GanttDiagramFactory());
 		factories.add(new ChronologyDiagramFactory());
@@ -277,6 +274,8 @@ public class PSystemBuilder {
 		factories.add(new HclDiagramFactory());
 		factories.add(new PSystemEbnfFactory());
 		factories.add(new PSystemRegexFactory());
+
+		factories.add(new ChenEerDiagramFactory());
 	}
 
 	private boolean isOk(Diagram ps) {

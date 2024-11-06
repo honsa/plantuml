@@ -53,7 +53,7 @@ public class StyleExtractor {
 	private final List<StringLocated> style = new ArrayList<>();
 	private String title = null;
 	private boolean handwritten = false;
-	private double scale = 1;
+	private String scale = null;
 
 	public StyleExtractor(Iterator<StringLocated> data) {
 		while (data.hasNext()) {
@@ -76,12 +76,7 @@ public class StyleExtractor {
 				// Ignore
 			} else if (list.size() >= 1 && s.startsWith("scale ")) {
 				// Ignore
-				try {
-					final double v = Double.parseDouble(s.replaceAll("\\D", ""));
-					if (v > 0)
-						scale = v;
-				} catch (Exception e) {
-				}
+				this.scale = s;
 			} else if (list.size() >= 1 && s.startsWith("title ")) {
 				this.title = s.substring("title ".length()).trim();
 			} else if (list.size() >= 1 && s.startsWith("skinparam ")) {
@@ -130,7 +125,7 @@ public class StyleExtractor {
 		return handwritten;
 	}
 
-	public double getScale() {
+	public String getScale() {
 		return scale;
 	}
 

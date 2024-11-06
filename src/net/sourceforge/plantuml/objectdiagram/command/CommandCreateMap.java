@@ -43,6 +43,7 @@ import net.sourceforge.plantuml.classdiagram.AbstractEntityDiagram;
 import net.sourceforge.plantuml.command.CommandExecutionResult;
 import net.sourceforge.plantuml.command.CommandMultilines2;
 import net.sourceforge.plantuml.command.MultilinesStrategy;
+import net.sourceforge.plantuml.command.ParserPass;
 import net.sourceforge.plantuml.command.Trim;
 import net.sourceforge.plantuml.cucadiagram.BodierMap;
 import net.sourceforge.plantuml.decoration.LinkDecor;
@@ -100,7 +101,7 @@ public class CommandCreateMap extends CommandMultilines2<AbstractEntityDiagram> 
 	}
 
 	@Override
-	protected CommandExecutionResult executeNow(AbstractEntityDiagram diagram, BlocLines lines)
+	protected CommandExecutionResult executeNow(AbstractEntityDiagram diagram, BlocLines lines, ParserPass currentPass)
 			throws NoSuchColorException {
 		lines = lines.trim().removeEmptyLines();
 		final RegexResult line0 = getStartingPattern().matcher(lines.getFirst().getTrimmed().getString());
@@ -128,7 +129,7 @@ public class CommandCreateMap extends CommandMultilines2<AbstractEntityDiagram> 
 
 				final LinkType linkType = new LinkType(LinkDecor.ARROW, LinkDecor.NONE);
 				final int length = linkStr.length() - 2;
-				final Link link = new Link(diagram.getEntityFactory(), diagram.getSkinParam().getCurrentStyleBuilder(),
+				final Link link = new Link(diagram, diagram.getSkinParam().getCurrentStyleBuilder(),
 						entity1, entity2, linkType, LinkArg.noDisplay(length));
 				link.setPortMembers(key, null);
 				diagram.addLink(link);

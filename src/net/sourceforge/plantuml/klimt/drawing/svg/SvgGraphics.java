@@ -84,7 +84,7 @@ import net.sourceforge.plantuml.utils.Log;
 import net.sourceforge.plantuml.xml.XmlFactories;
 
 public class SvgGraphics {
-    // ::remove file when __HAXE__
+	// ::remove file when __HAXE__
 
 	// http://tutorials.jenkov.com/svg/index.html
 	// http://www.svgbasics.com/
@@ -317,6 +317,13 @@ public class SvgGraphics {
 		svg.setAttribute("xmlns", "http://www.w3.org/2000/svg");
 		svg.setAttribute("xmlns:xlink", "http://www.w3.org/1999/xlink");
 		svg.setAttribute("version", "1.1");
+
+		if (option.getTitle() != null) {
+			// Create a title element and set its text
+			final Element title = (Element) document.createElement("title");
+			title.setTextContent(option.getTitle());
+			svg.appendChild(title);
+		}
 
 		return svg;
 	}
@@ -649,10 +656,6 @@ public class SvgGraphics {
 	}
 
 	public void createXml(OutputStream os) throws TransformerException, IOException {
-		if (images.size() == 0) {
-			createXmlInternal(os);
-			return;
-		}
 		final ByteArrayOutputStream baos = new ByteArrayOutputStream();
 		createXmlInternal(baos);
 		String s = new String(baos.toByteArray());
@@ -1068,8 +1071,9 @@ public class SvgGraphics {
 		if (SecurityUtils.ignoreThisLink(url))
 			return;
 
-//		if (pendingAction.size() > 0)
-//			closeLink();
+		// https://github.com/plantuml/plantuml/issues/1951
+		if (pendingAction.size() > 0)
+			closeLink();
 
 		pendingAction.add(0, (Element) document.createElement("a"));
 		pendingAction.get(0).setAttribute("target", target);

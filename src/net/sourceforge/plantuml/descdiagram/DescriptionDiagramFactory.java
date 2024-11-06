@@ -39,7 +39,6 @@ import java.util.List;
 import java.util.Map;
 
 import net.sourceforge.plantuml.classdiagram.command.CommandHideShow2;
-import net.sourceforge.plantuml.classdiagram.command.CommandNamespaceSeparator;
 import net.sourceforge.plantuml.classdiagram.command.CommandRemoveRestore;
 import net.sourceforge.plantuml.classdiagram.command.CommandUrl;
 import net.sourceforge.plantuml.command.Command;
@@ -48,6 +47,7 @@ import net.sourceforge.plantuml.command.CommandFootboxIgnored;
 import net.sourceforge.plantuml.command.CommandRankDir;
 import net.sourceforge.plantuml.command.CommonCommands;
 import net.sourceforge.plantuml.command.PSystemCommandFactory;
+import net.sourceforge.plantuml.command.ParserPass;
 import net.sourceforge.plantuml.command.note.CommandFactoryNote;
 import net.sourceforge.plantuml.command.note.CommandFactoryNoteOnEntity;
 import net.sourceforge.plantuml.command.note.CommandFactoryNoteOnLink;
@@ -91,7 +91,7 @@ public class DescriptionDiagramFactory extends PSystemCommandFactory {
 		final CommandFactoryNote factoryNoteCommand = new CommandFactoryNote();
 		cmds.add(factoryNoteCommand.createMultiLine(false));
 
-		final CommandFactoryNoteOnLink factoryNoteOnLinkCommand = new CommandFactoryNoteOnLink();
+		final CommandFactoryNoteOnLink factoryNoteOnLinkCommand = new CommandFactoryNoteOnLink(ParserPass.ONE);
 		cmds.add(factoryNoteOnLinkCommand.createSingleLine());
 		cmds.add(factoryNoteOnLinkCommand.createMultiLine(false));
 
@@ -104,7 +104,7 @@ public class DescriptionDiagramFactory extends PSystemCommandFactory {
 						new RegexLeaf("\\((?!\\*\\))[^\\)]+\\)"), //
 						new RegexLeaf(":[^:]+:"), //
 						new RegexLeaf("[%g][^%g]+[%g]") //
-				));
+				), ParserPass.ONE);
 		cmds.add(factoryNoteOnEntityCommand.createSingleLine());
 
 		cmds.add(factoryNoteCommand.createSingleLine());
